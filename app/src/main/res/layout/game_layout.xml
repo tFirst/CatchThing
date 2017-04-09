@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="7"
+    android:id="@+id/linearLayout">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="67dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/textViewScore"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="17dp"
+            android:layout_marginEnd="17dp"
+            android:layout_width="70dp" />
+
+        <TextView
+            android:text="Очки:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/textViewScore"
+            android:layout_toStartOf="@+id/textViewScore"
+            android:layout_marginRight="19dp"
+            android:layout_marginEnd="19dp"
+            android:id="@+id/textView"
+            android:textSize="24sp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_weight="6"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relativeLayoutGame"
+        android:layout_marginEnd="0dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="0dp"
+        android:background="@android:color/darker_gray">
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/buttonNoClick"
+            android:background="@drawable/red_circle"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/buttonGame" />
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/buttonGame"
+            android:background="@drawable/green_circle"
+            android:visibility="invisible"
+            android:onClick="clickToButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/startGameButton"
+            android:background="@drawable/start_game_icon"
+            android:onClick="startGame"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+
+</LinearLayout>
