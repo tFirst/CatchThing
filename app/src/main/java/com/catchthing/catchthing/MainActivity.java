@@ -1,12 +1,10 @@
 package com.catchthing.catchthing;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-
-import com.catchsquare.catchsquare.R;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,11 +20,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void Init() {
-        record = (TextView) findViewById(R.id.textViewRecord);
+        record = findViewById(R.id.textViewRecord);
     }
 
-    public void goGame(View view) {
-        Intent intent = new Intent(this, Game.class);
+    public void goGameLeft(View view) {
+        Intent intent = new Intent(this, GameLeft.class);
+        startActivity(intent);
+    }
+
+    public void goGameRight(View view) {
+        Intent intent = new Intent(this, GameRight.class);
         startActivity(intent);
     }
 

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CatchSquare</string>
+    <string name="gameRulesButtonDescription">Правила игры</string>
+    <string name="yourRecordLabelDescription">Ваш рекорд:</string>
+    <string name="gameLeftScoreLabelDescription">Очки:</string>
+    <string name="scoresTextLabelGameRight">Очки:</string>
 </resources>
