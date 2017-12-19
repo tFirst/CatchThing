@@ -223,7 +223,7 @@ public class GameRight extends AppCompatActivity {
             osw.write(count);
             osw.close();
         } catch (Throwable t) {
-            Toast.makeText(MainActivity.getContext(),
+            Toast.makeText(GameRight.this,
                     "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
         }
     }

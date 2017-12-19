@@ -4,6 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/main_menu_background_game"
     tools:context="com.catchthing.catchthing.MainActivity">
 
     <Button
@@ -26,25 +27,30 @@
         android:onClick="goGameRight" />
 
     <TextView
-        android:layout_height="wrap_content"
         android:id="@+id/textViewRecord"
-        android:textSize="30sp"
         android:layout_width="80dp"
+        android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/textView2"
         android:layout_alignBottom="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2"
         android:layout_toRightOf="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2" />
+        android:textSize="30sp" />
+
+    <com.catchthing.catchthing.GifView
+        android:id="@+id/gifview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <TextView
-        android:text="@string/yourRecordLabelDescription"
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView2"
-        android:textSize="30sp"
-        android:layout_marginTop="90dp"
+        android:layout_alignEnd="@+id/buttonGameRules"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/buttonGameRules"
-        android:layout_alignEnd="@+id/buttonGameRules" />
+        android:layout_marginTop="90dp"
+        android:text="@string/yourRecordLabelDescription"
+        android:textSize="30sp" />
 
     <Button
         android:id="@+id/button"

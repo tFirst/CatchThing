@@ -21,7 +21,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getApplicationContext();
+
         setContentView(R.layout.activity_main);
+        GifView gifView = findViewById(R.id.gifview);
         Init();
     }
 
