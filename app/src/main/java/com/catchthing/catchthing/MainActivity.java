@@ -1,6 +1,5 @@
 package com.catchthing.catchthing;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,29 +9,17 @@ import android.widget.TextView;
 import com.catchthing.catchthing.games.GameLeft;
 import com.catchthing.catchthing.games.GameRight;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    private static Context mContext;
-    private TextView record;
+
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContext = getApplicationContext();
 
         setContentView(R.layout.activity_main);
-        GifView gifView = findViewById(R.id.gifview);
-        Init();
-    }
-
-    public static Context getContext() {
-        return mContext;
-    }
-
-    private void Init() {
-        record = findViewById(R.id.textViewRecord);
+        findViewById(R.id.gifview);
     }
 
     public void goGameLeft(View view) {
@@ -48,17 +35,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        readScore();
-    }
-
-    private void readScore() {
-        try {
-            FileInputStream fin = openFileInput("score_left.cc");
-            record.setText(String.valueOf(fin.read()));
-            fin.close();
-        } catch (IOException e) {
-            record.setText(String.valueOf(0));
-            e.printStackTrace();
-        }
     }
 }

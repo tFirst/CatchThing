@@ -9,11 +9,12 @@
 
     <Button
         android:id="@+id/buttonGameRules"
-        android:layout_width="wrap_content"
+        android:layout_width="250px"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="68dp"
+        android:background="@android:drawable/button_onoff_indicator_on"
         android:text="@string/gameRulesButtonDescription" />
 
     <Button
@@ -23,18 +24,8 @@
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/buttonGameRules"
         android:layout_toRightOf="@+id/buttonGameRules"
-        android:background="@android:drawable/ic_media_next"
+        android:background="@drawable/arrow_right"
         android:onClick="goGameRight" />
-
-    <TextView
-        android:id="@+id/textViewRecord"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView2"
-        android:layout_alignBottom="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2"
-        android:layout_toRightOf="@+id/textView2"
-        android:textSize="30sp" />
 
     <com.catchthing.catchthing.GifView
         android:id="@+id/gifview"
@@ -45,20 +36,25 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/buttonGameRules"
-        android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/buttonGameRules"
-        android:layout_marginTop="90dp"
-        android:text="@string/yourRecordLabelDescription"
-        android:textSize="30sp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="72dp"
+        android:fontFamily="casual"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_green_dark"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:typeface="normal"
+        android:visibility="visible"
+        tools:ignore="RelativeOverlap" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/buttonGameRules"
+        android:layout_toStartOf="@+id/buttonGameRules"
         android:layout_centerVertical="true"
-        android:background="@android:drawable/ic_media_previous"
+        android:background="@drawable/arrow_left"
         android:onClick="goGameLeft" />
 </RelativeLayout>
