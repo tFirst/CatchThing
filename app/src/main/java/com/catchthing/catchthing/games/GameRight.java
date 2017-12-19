@@ -1,11 +1,11 @@
 package com.catchthing.catchthing.games;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -35,6 +35,7 @@ public class GameRight extends AppCompatActivity {
     private int sizeCircles = 70;
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
+    private TextView textViewRecordRight;
     private Button buttonGame;
     private Button startGameButton;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
@@ -50,14 +51,22 @@ public class GameRight extends AppCompatActivity {
     private void Init() {
         random = new Random();
         relativeLayout = findViewById(R.id.relativeLayoutGameRight);
+        relativeLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.background));
         startGameButton = findViewById(R.id.startGameButtonRight);
         buttonGame = findViewById(R.id.buttonGameRight);
         textViewScore = findViewById(R.id.textViewScoreRight);
+        textViewRecordRight = findViewById(R.id.textViewRecord2);
+        setRecord();
         layoutParamsArrayList = new ArrayList<>();
 
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
+    }
+
+    private void forBegin() {
+        Intent intent = new Intent(this, GameRight.class);
+        startActivity(intent);
     }
 
     protected void start() throws InterruptedException {
@@ -159,18 +168,16 @@ public class GameRight extends AppCompatActivity {
         if (countDownTimer != null)
             countDownTimer.cancel();
         saveScore();
-        count = 0;
         String title = "Проигрыш: Вы не успели нажать на кнопку";
-        Context context = GameRight.this;
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(GameRight.this);
         builder.setTitle(title)
-                .setMessage("Ваш счет: " + textViewScore.getText())
+                .setMessage("Ваш счет: " + count)
                 .setCancelable(false)
                 .setPositiveButton("Начать заново",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                onCreate(new Bundle());
+                                forBegin();
                             }
                         })
                 .setNegativeButton("Выход",
@@ -182,6 +189,7 @@ public class GameRight extends AppCompatActivity {
                         });
         AlertDialog alert = builder.create();
         alert.show();
+        count = 0;
     }
 
     private void closeGame() {
@@ -202,10 +210,10 @@ public class GameRight extends AppCompatActivity {
                 StringBuilder builder = new StringBuilder();
 
                 while ((line = reader.readLine()) != null) {
-                    builder.append(line).append("\n");
+                    builder.append(line);
                 }
 
-                if (Integer.parseInt(String.valueOf(builder)) < Integer.parseInt(String.valueOf(textViewScore.getText()))) {
+                if (Integer.parseInt(String.valueOf(builder)) < count) {
                     saveFile(FILENAME);
                 }
 
@@ -234,5 +242,29 @@ public class GameRight extends AppCompatActivity {
 
         }
         return layoutParams;
+    }
+
+    private void setRecord() {
+        String FILENAME = "score_right.cc";
+
+        try {
+            InputStream inputStream = openFileInput(FILENAME);
+
+            if (inputStream != null) {
+                InputStreamReader isr = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(isr);
+                String line = reader.readLine();
+
+                if (line != null) {
+                    textViewRecordRight.setText(line);
+                } else {
+                    textViewRecordRight.setText("0");
+                }
+
+                inputStream.close();
+            }
+        } catch (Throwable t) {
+            saveFile(FILENAME);
+        }
     }
 }

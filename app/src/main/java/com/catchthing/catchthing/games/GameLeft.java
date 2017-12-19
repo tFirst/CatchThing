@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -35,6 +36,7 @@ public class GameLeft extends AppCompatActivity {
     private int sizeCircles = 70;
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
+    private TextView textViewRecord;
     private Button buttonGame;
     private Button buttonNoClick;
     private Button startGameButton;
@@ -53,11 +55,14 @@ public class GameLeft extends AppCompatActivity {
     private void Init() {
         random = new Random();
         relativeLayout = findViewById(R.id.relativeLayoutGameLeft);
+        relativeLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.background));
         startGameButton = findViewById(R.id.startGameButtonLeft);
         buttonNoClick = findViewById(R.id.buttonNoClick);
         buttonGame = findViewById(R.id.buttonGameLeft);
         textViewScore = findViewById(R.id.textViewScoreLeft);
         textViewScore.setText("0");
+        textViewRecord = findViewById(R.id.textViewRecord);
+        setRecord();
         buttonNoClickList = new ArrayList<>();
         layoutParamsArrayList = new ArrayList<>();
 
@@ -71,6 +76,11 @@ public class GameLeft extends AppCompatActivity {
                 showAlertDialog("miss");
             }
         };
+    }
+
+    private void forBegin() {
+        Intent intent = new Intent(this, GameLeft.class);
+        startActivity(intent);
     }
 
     protected void start() {
@@ -188,7 +198,7 @@ public class GameLeft extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                onCreate(new Bundle());
+                                forBegin();
                             }
                         })
                 .setNegativeButton("Выход",
@@ -244,6 +254,30 @@ public class GameLeft extends AppCompatActivity {
         } catch (Throwable t) {
             Toast.makeText(getApplicationContext(),
                     "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void setRecord() {
+        String FILENAME = "score_left.cc";
+
+        try {
+            InputStream inputStream = openFileInput(FILENAME);
+
+            if (inputStream != null) {
+                InputStreamReader isr = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(isr);
+                String line = reader.readLine();
+
+                if (line != null) {
+                    textViewRecord.setText(line);
+                } else {
+                    textViewRecord.setText("0");
+                }
+
+                inputStream.close();
+            }
+        } catch (Throwable t) {
+            saveFile(FILENAME);
         }
     }
 }
