@@ -8,7 +8,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.catchthing.catchthing.MainActivity">
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -16,9 +18,19 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.catchthing.catchthing.GameLeft" />
+        <activity
+            android:name="com.catchthing.catchthing.MainActivity"
+            android:hardwareAccelerated="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-        <activity android:name="com.catchthing.catchthing.GameRight" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.catchthing.catchthing.games.GameLeft" />
+
+        <activity android:name="com.catchthing.catchthing.games.GameRight" />
     </application>
 
 </manifest>

@@ -12,23 +12,48 @@
         android:layout_weight="1">
 
         <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:id="@+id/textViewScore"
+            android:layout_alignBaseline="@+id/textViewRecord2"
+            android:layout_alignBottom="@+id/textViewRecord2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:text="Рекорд:"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/textViewRecord2"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_toEndOf="@+id/textView4"
+            android:layout_toRightOf="@+id/textView4"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/textViewScoreRight"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="17dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_marginEnd="17dp"
-            android:layout_width="70dp" />
+            android:layout_marginRight="17dp"
+            android:ems="10"
+            android:textSize="24sp" />
 
         <TextView
             android:text="@string/scoresTextLabelGameRight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/textViewScore"
-            android:layout_toStartOf="@+id/textViewScore"
+            android:layout_toLeftOf="@+id/textViewScoreRight"
+            android:layout_toStartOf="@+id/textViewScoreRight"
             android:layout_marginRight="19dp"
             android:layout_marginEnd="19dp"
             android:id="@+id/textView"
@@ -40,7 +65,7 @@
         android:layout_weight="6"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/relativeLayoutGame"
+        android:id="@+id/relativeLayoutGameRight"
         android:layout_marginEnd="0dp"
         android:layout_marginRight="50dp"
         android:layout_marginBottom="0dp"
@@ -51,15 +76,7 @@
         <Button
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/buttonNoClick"
-            android:background="@drawable/red_circle"
-            android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@+id/buttonGame" />
-
-        <Button
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/buttonGame"
+            android:id="@+id/buttonGameRight"
             android:background="@drawable/green_circle"
             android:visibility="invisible"
             android:onClick="clickToButtonRight"
@@ -68,7 +85,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/startGameButton"
+            android:id="@+id/startGameButtonRight"
             android:background="@drawable/start_game_icon"
             android:onClick="startGame"
             android:layout_centerVertical="true"
