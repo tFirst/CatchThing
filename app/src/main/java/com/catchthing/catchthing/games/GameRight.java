@@ -1,45 +1,43 @@
 package com.catchthing.catchthing.games;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.catchthing.catchthing.MainActivity;
 import com.catchthing.catchthing.R;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
 
-public class GameRight extends Activity {
+public class GameRight extends AppCompatActivity {
+    private final GameRight gameRight = this;
     private CountDownTimer countDownTimer;
-    private int DIFFICULTY_LEVEL;
-    private int MAX_DIFFICULTY_LEVEL = 20;
     private Random random;
     private int count = 0;
     private int sizeCircles = 70;
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
     private Button buttonGame;
-    private Button buttonNoClick;
     private Button startGameButton;
-    private ArrayList<Button> buttonNoClickList;
-    private View.OnClickListener onClickListener;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
-    private float density;
 
 
     @Override
@@ -50,33 +48,21 @@ public class GameRight extends Activity {
     }
 
     private void Init() {
-        density = getApplicationContext().getResources().getDisplayMetrics().density;
         random = new Random();
-        relativeLayout = findViewById(R.id.relativeLayoutGame);
-        startGameButton = findViewById(R.id.startGameButton);
-        buttonNoClick = findViewById(R.id.buttonNoClick);
-        buttonGame = findViewById(R.id.buttonGame);
-        textViewScore = findViewById(R.id.textViewScore);
-        //buttonNoClickList = new ArrayList<>();
+        relativeLayout = findViewById(R.id.relativeLayoutGameRight);
+        startGameButton = findViewById(R.id.startGameButtonRight);
+        buttonGame = findViewById(R.id.buttonGameRight);
+        textViewScore = findViewById(R.id.textViewScoreRight);
         layoutParamsArrayList = new ArrayList<>();
 
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
-
-        onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAlertDialog("miss");
-            }
-        };
     }
 
     protected void start() throws InterruptedException {
-        Random random = new Random();
-        Thread.sleep(random.nextInt(3000));
         System.out.println("for green");
-        layoutParamsArrayList.add(getRandomParams(buttonGame));
+        layoutParamsArrayList.add(getRandomParams());
         buttonGame.setLayoutParams(checkLayoutParams
                 (layoutParamsArrayList.get(layoutParamsArrayList.size() - 1),
                         layoutParamsArrayList.size() - 1));
@@ -84,7 +70,7 @@ public class GameRight extends Activity {
         startTimer();
     }
 
-    private RelativeLayout.LayoutParams getRandomParams(Button buttonGame) {
+    private RelativeLayout.LayoutParams getRandomParams() {
         RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
         int left, top;
@@ -128,24 +114,32 @@ public class GameRight extends Activity {
         buttonGame.setVisibility(View.INVISIBLE);
         count++;
         layoutParamsArrayList.clear();
-//        for (int i = 0; i < buttonNoClickList.size(); i++) {
-//            buttonNoClickList.get(i).setVisibility(View.GONE);
-//        }
-//        if (count % 3 == 0)
-//            if (DIFFICULTY_LEVEL < MAX_DIFFICULTY_LEVEL)
-//                DIFFICULTY_LEVEL++;
-//            else
-//                DIFFICULTY_LEVEL = MAX_DIFFICULTY_LEVEL;
         if (countDownTimer != null)
             countDownTimer.cancel();
         textViewScore.setText(String.valueOf(count));
-        start();
+        sleep();
     }
 
     public void startGame(View view) throws InterruptedException {
-        DIFFICULTY_LEVEL = 0;
         startGameButton.setVisibility(View.GONE);
         start();
+    }
+
+    private void sleep() {
+        countDownTimer = new CountDownTimer(1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                try {
+                    gameRight.start();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     private void startTimer() {
@@ -156,25 +150,21 @@ public class GameRight extends Activity {
 
             @Override
             public void onFinish() {
-                showAlertDialog("time");
+                showAlertDialog();
             }
         }.start();
     }
 
-    protected void showAlertDialog(String msg) {
+    protected void showAlertDialog() {
         if (countDownTimer != null)
             countDownTimer.cancel();
         saveScore();
         count = 0;
-        String title;
-        if (msg.equals("time")) {
-            title = "Проигрыш: вы не успели нажать на кнопку";
-        } else {
-            title = "Проигрыш: вы промахнулись";
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(GameRight.this);
+        String title = "Проигрыш: Вы не успели нажать на кнопку";
+        Context context = GameRight.this;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title)
-                .setMessage("Ваш счет: \n" + textViewScore.getText())
+                .setMessage("Ваш счет: " + textViewScore.getText())
                 .setCancelable(false)
                 .setPositiveButton("Начать заново",
                         new DialogInterface.OnClickListener() {
@@ -200,24 +190,41 @@ public class GameRight extends Activity {
     }
 
     private void saveScore() {
+        String FILENAME = "score_right.cc";
+
         try {
-            FileInputStream fin = openFileInput("score_game_left.cc");
-            if (fin.read() < count) {
-                OutputStreamWriter osw = new OutputStreamWriter(openFileOutput("score_game_left.cc", MODE_PRIVATE));
-                osw.write(count);
-                osw.close();
-                System.out.println("Write the score " + count + " in file " + fin);
+            InputStream inputStream = openFileInput(FILENAME);
+
+            if (inputStream != null) {
+                InputStreamReader isr = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(isr);
+                String line;
+                StringBuilder builder = new StringBuilder();
+
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line).append("\n");
+                }
+
+                if (Integer.parseInt(String.valueOf(builder)) < Integer.parseInt(String.valueOf(textViewScore.getText()))) {
+                    saveFile(FILENAME);
+                }
+
+                inputStream.close();
             }
-            fin.close();
-        } catch (IOException e) {
-            try {
-                FileOutputStream fout = openFileOutput("score_game_left.cc", 0);
-                OutputStreamWriter osw = new OutputStreamWriter(fout);
-                osw.write(count);
-                osw.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+        } catch (Throwable t) {
+            saveFile(FILENAME);
+        }
+    }
+
+    private void saveFile(String fileName) {
+        try {
+            OutputStream outputStream = openFileOutput(fileName, 0);
+            OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+            osw.write(count);
+            osw.close();
+        } catch (Throwable t) {
+            Toast.makeText(MainActivity.getContext(),
+                    "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -227,44 +234,5 @@ public class GameRight extends Activity {
 
         }
         return layoutParams;
-    }
-
-    private boolean checkIntersection(int top1, int left1, int top2, int left2) {
-        return checkTopInter(top1, top2) &&
-                checkLeftInter(left1, left2);
-    }
-
-    private boolean checkTopInter(int arg1, int arg2) {
-        return Math.abs(arg1 - arg2) <= sizeCircles;
-    }
-
-    private boolean checkTopSign(int arg1, int arg2) {
-        return arg1 <= arg2;
-    }
-
-    private boolean checkLeftInter(int arg1, int arg2) {
-        return Math.abs(arg1 - arg2) <= sizeCircles;
-    }
-
-    private boolean checkLeftSign(int arg1, int arg2) {
-        return arg1 <= arg2;
-    }
-
-    private boolean checkBorderTopInter(int top) {
-        return Math.abs(top - relativeLayout.getHeight()) <= sizeCircles;
-    }
-
-    private boolean checkBorderTopSign(int top) {
-        return relativeLayout.getHeight()
-                <= top;
-    }
-
-    private boolean checkBorderLeftInter(int left) {
-        return Math.abs(left - relativeLayout.getWidth()) <= sizeCircles;
-    }
-
-    private boolean checkBorderLeftSign(int left) {
-        return relativeLayout.getWidth()
-                <= left;
     }
 }

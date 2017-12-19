@@ -1,30 +1,32 @@
 package com.catchthing.catchthing.games;
 
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.catchthing.catchthing.MainActivity;
 import com.catchthing.catchthing.R;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GameLeft extends Activity {
+public class GameLeft extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private int DIFFICULTY_LEVEL;
     private int MAX_DIFFICULTY_LEVEL = 20;
@@ -39,7 +41,6 @@ public class GameLeft extends Activity {
     private ArrayList<Button> buttonNoClickList;
     private View.OnClickListener onClickListener;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
-    private float density;
 
 
     @Override
@@ -50,13 +51,13 @@ public class GameLeft extends Activity {
     }
 
     private void Init() {
-        density = getApplicationContext().getResources().getDisplayMetrics().density;
         random = new Random();
-        relativeLayout = findViewById(R.id.relativeLayoutGame);
-        startGameButton = findViewById(R.id.startGameButton);
+        relativeLayout = findViewById(R.id.relativeLayoutGameLeft);
+        startGameButton = findViewById(R.id.startGameButtonLeft);
         buttonNoClick = findViewById(R.id.buttonNoClick);
-        buttonGame = findViewById(R.id.buttonGame);
-        textViewScore = findViewById(R.id.textViewScore);
+        buttonGame = findViewById(R.id.buttonGameLeft);
+        textViewScore = findViewById(R.id.textViewScoreLeft);
+        textViewScore.setText("0");
         buttonNoClickList = new ArrayList<>();
         layoutParamsArrayList = new ArrayList<>();
 
@@ -77,9 +78,8 @@ public class GameLeft extends Activity {
             Button button = new Button(this);
             button.setId(i);
             System.out.println("but " + i);
-            layoutParamsArrayList.add(getRandomParams(button));
-            button.setLayoutParams
-                    (checkLayoutParams(layoutParamsArrayList.get(i), i));
+            layoutParamsArrayList.add(getRandomParams());
+            button.setLayoutParams(layoutParamsArrayList.get(i));
             button.setOnClickListener(onClickListener);
             button.setBackground(buttonNoClick.getBackground());
             button.setVisibility(View.VISIBLE);
@@ -88,15 +88,13 @@ public class GameLeft extends Activity {
             relativeLayout.addView(button);
         }
         System.out.println("for green");
-        layoutParamsArrayList.add(getRandomParams(buttonGame));
-        buttonGame.setLayoutParams(checkLayoutParams
-                (layoutParamsArrayList.get(layoutParamsArrayList.size() - 1),
-                        layoutParamsArrayList.size() - 1));
+        layoutParamsArrayList.add(getRandomParams());
+        buttonGame.setLayoutParams((layoutParamsArrayList.get(layoutParamsArrayList.size() - 1)));
         buttonGame.setVisibility(View.VISIBLE);
         startTimer();
     }
 
-    private RelativeLayout.LayoutParams getRandomParams(Button buttonGame) {
+    private RelativeLayout.LayoutParams getRandomParams() {
         RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
         int left, top;
@@ -176,16 +174,15 @@ public class GameLeft extends Activity {
         if (countDownTimer != null)
             countDownTimer.cancel();
         saveScore();
-        count = 0;
         String title;
         if (msg.equals("time")) {
-            title = "Проигрыш: вы не успели нажать на кнопку";
+            title = "Проигрыш: Вы не успели нажать на кнопку";
         } else {
-            title = "Проигрыш: вы промахнулись";
+            title = "Проигрыш: Вы промахнулись";
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(GameLeft.this);
         builder.setTitle(title)
-                .setMessage("Ваш счет: \n" + textViewScore.getText())
+                .setMessage("Ваш счет: " + count)
                 .setCancelable(false)
                 .setPositiveButton("Начать заново",
                         new DialogInterface.OnClickListener() {
@@ -203,6 +200,7 @@ public class GameLeft extends Activity {
                         });
         AlertDialog alert = builder.create();
         alert.show();
+        count = 0;
     }
 
     private void closeGame() {
@@ -211,192 +209,41 @@ public class GameLeft extends Activity {
     }
 
     private void saveScore() {
+        String FILENAME = "score_left.cc";
+
         try {
-            FileInputStream fin = openFileInput("score.cc");
-            if (fin.read() < count) {
-                OutputStreamWriter osw = new OutputStreamWriter(openFileOutput("score.cc", MODE_PRIVATE));
-                osw.write(count);
-                osw.close();
-                System.out.println("Write the score " + count + " in file " + fin);
+            InputStream inputStream = openFileInput(FILENAME);
+
+            if (inputStream != null) {
+                InputStreamReader isr = new InputStreamReader(inputStream);
+                BufferedReader reader = new BufferedReader(isr);
+                String line;
+                StringBuilder builder = new StringBuilder();
+
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line);
+                }
+
+                if (Integer.parseInt(String.valueOf(builder)) < count) {
+                    saveFile(FILENAME);
+                }
+
+                inputStream.close();
             }
-            fin.close();
-        } catch (IOException e) {
-            try {
-                FileOutputStream fout = openFileOutput("score.cc", 0);
-                OutputStreamWriter osw = new OutputStreamWriter(fout);
-                osw.write(count);
-                osw.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+        } catch (Throwable t) {
+            saveFile(FILENAME);
         }
     }
 
-    private RelativeLayout.LayoutParams checkLayoutParams
-            (RelativeLayout.LayoutParams layoutParams, int number) {
-        if (layoutParamsArrayList.size() != 0) {
-
+    private void saveFile(String fileName) {
+        try {
+            OutputStream outputStream = openFileOutput(fileName, 0);
+            OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+            osw.write(count);
+            osw.close();
+        } catch (Throwable t) {
+            Toast.makeText(getApplicationContext(),
+                    "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
         }
-        return layoutParams;
-    }
-
-    private RelativeLayout.LayoutParams switchResultsCheckingMargins
-            (RelativeLayout.LayoutParams layoutParams, int number) {
-        int topMargin, leftMargin;
-        for (int i = 0; i < layoutParamsArrayList.size() - 1; i++) {
-            if (number == i)
-                i++;
-            topMargin = layoutParamsArrayList.get(i).topMargin;
-            leftMargin = layoutParamsArrayList.get(i).leftMargin;
-            switch (checkMargins(topMargin, leftMargin,
-                    layoutParams.topMargin, layoutParams.leftMargin)) {
-                case 1:
-                    System.out.println("Текущая точка (" + layoutParams.topMargin + ":" +
-                            layoutParams.leftMargin + ") выше и правее, чем (" +
-                            topMargin + ":" + leftMargin + ")");
-                    layoutParams.topMargin -= sizeCircles - Math.abs(topMargin - layoutParams.topMargin) + 1;
-                    layoutParams.leftMargin += sizeCircles - Math.abs(leftMargin - layoutParams.leftMargin) + 1;
-                    System.out.println("Координаты изменились на (" + layoutParams.topMargin +
-                            ":" + layoutParams.leftMargin + ")");
-                    break;
-                case 2:
-                    System.out.println("Текущая точка (" + layoutParams.topMargin + ":" +
-                            layoutParams.leftMargin + ") выше и левее, чем (" +
-                            topMargin + ":" + leftMargin + ")");
-                    layoutParams.topMargin -= sizeCircles - Math.abs(topMargin - layoutParams.topMargin) + 1;
-                    layoutParams.leftMargin -= sizeCircles - Math.abs(leftMargin - layoutParams.leftMargin) + 1;
-                    System.out.println("Координаты изменились на (" + layoutParams.topMargin +
-                            ":" + layoutParams.leftMargin + ")");
-                    break;
-                case 3:
-                    System.out.println("Текущая точка (" + layoutParams.topMargin + ":" +
-                            layoutParams.leftMargin + ") ниже и правее, чем (" +
-                            topMargin + ":" + leftMargin + ")");
-                    layoutParams.topMargin += sizeCircles - Math.abs(topMargin - layoutParams.topMargin) + 1;
-                    layoutParams.leftMargin += sizeCircles - Math.abs(leftMargin - layoutParams.leftMargin) + 1;
-                    System.out.println("Координаты изменились на (" + layoutParams.topMargin +
-                            ":" + layoutParams.leftMargin + ")");
-                    break;
-                case 4:
-                    System.out.println("Текущая точка (" + layoutParams.topMargin + ":" +
-                            layoutParams.leftMargin + ") ниже и левее, чем (" +
-                            topMargin + ":" + leftMargin + ")");
-                    layoutParams.topMargin += sizeCircles - Math.abs(topMargin - layoutParams.topMargin) + 1;
-                    layoutParams.leftMargin -= sizeCircles - Math.abs(leftMargin - layoutParams.leftMargin) + 1;
-                    System.out.println("Координаты изменились на (" + layoutParams.topMargin +
-                            ":" + layoutParams.leftMargin + ")");
-                    break;
-                case 0:
-                    System.out.println("Точки (" + layoutParams.topMargin + ":" +
-                            layoutParams.leftMargin + ") и (" +
-                            topMargin + ":" + leftMargin + ") не пересекаются");
-                    break;
-            }
-        }
-        return layoutParams;
-    }
-
-    private int checkMargins(int topArray, int leftArray, int baseTop, int baseLeft) {
-        if (checkIntersection(topArray, leftArray, baseTop, baseLeft))
-            if (checkTopSign(topArray, baseTop))
-                if (checkLeftSign(leftArray, baseLeft))
-                    return 3;
-                else
-                    return 4;
-            else if (checkLeftSign(leftArray, baseLeft))
-                return 1;
-            else
-                return 2;
-        else
-            return 0;
-    }
-
-    /**
-     * private RelativeLayout.LayoutParams switchResultsCheckingBorders
-     * (RelativeLayout.LayoutParams layoutParams) {
-     * switch (checkBorders(layoutParams.topMargin, layoutParams.leftMargin)) {
-     * case 1:
-     * layoutParams.topMargin -= sizeCircles;
-     * layoutParams.leftMargin -= sizeCircles;
-     * break;
-     * case 2:
-     * layoutParams.topMargin -= sizeCircles;
-     * layoutParams.leftMargin += sizeCircles;
-     * break;
-     * case 3:
-     * layoutParams.topMargin -= sizeCircles;
-     * break;
-     * case 4:
-     * layoutParams.topMargin += sizeCircles;
-     * layoutParams.leftMargin -= sizeCircles;
-     * break;
-     * case 5:
-     * }
-     * }
-     */
-
-    private int checkBorders(int top, int left) {
-        if (checkBorderTopInter(top))
-            if (checkBorderTopSign(top))
-                if (checkBorderLeftInter(left))
-                    if (checkBorderLeftSign(left))
-                        return 1;
-                    else
-                        return 2;
-                else
-                    return 3;
-            else if (checkBorderLeftInter(left))
-                if (checkBorderLeftSign(left))
-                    return 3;
-                else
-                    return 4;
-            else
-                return 5;
-        else if (checkBorderLeftInter(left))
-            if (checkBorderLeftSign(left))
-                return 6;
-            else
-                return 7;
-        else
-            return 0;
-    }
-
-    private boolean checkIntersection(int top1, int left1, int top2, int left2) {
-        return checkTopInter(top1, top2) &&
-                checkLeftInter(left1, left2);
-    }
-
-    private boolean checkTopInter(int arg1, int arg2) {
-        return Math.abs(arg1 - arg2) <= sizeCircles;
-    }
-
-    private boolean checkTopSign(int arg1, int arg2) {
-        return arg1 <= arg2;
-    }
-
-    private boolean checkLeftInter(int arg1, int arg2) {
-        return Math.abs(arg1 - arg2) <= sizeCircles;
-    }
-
-    private boolean checkLeftSign(int arg1, int arg2) {
-        return arg1 <= arg2;
-    }
-
-    private boolean checkBorderTopInter(int top) {
-        return Math.abs(top - relativeLayout.getHeight()) <= sizeCircles;
-    }
-
-    private boolean checkBorderTopSign(int top) {
-        return relativeLayout.getHeight()
-                <= top;
-    }
-
-    private boolean checkBorderLeftInter(int left) {
-        return Math.abs(left - relativeLayout.getWidth()) <= sizeCircles;
-    }
-
-    private boolean checkBorderLeftSign(int left) {
-        return relativeLayout.getWidth()
-                <= left;
     }
 }
