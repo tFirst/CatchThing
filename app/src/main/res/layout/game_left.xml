@@ -14,7 +14,7 @@
         <TextView
             android:layout_height="wrap_content"
             android:ems="10"
-            android:id="@+id/textViewScore"
+            android:id="@+id/textViewScoreLeft"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
@@ -27,8 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/textViewScore"
-            android:layout_toStartOf="@+id/textViewScore"
+            android:layout_toLeftOf="@+id/textViewScoreLeft"
+            android:layout_toStartOf="@+id/textViewScoreLeft"
             android:layout_marginRight="19dp"
             android:layout_marginEnd="19dp"
             android:id="@+id/textView"
@@ -40,7 +40,7 @@
         android:layout_weight="6"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/relativeLayoutGame"
+        android:id="@+id/relativeLayoutGameLeft"
         android:layout_marginEnd="0dp"
         android:layout_marginRight="50dp"
         android:layout_marginBottom="0dp"
@@ -54,12 +54,12 @@
             android:id="@+id/buttonNoClick"
             android:background="@drawable/red_circle"
             android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@+id/buttonGame" />
+            app:layout_constraintTop_toBottomOf="@+id/buttonGameLeft" />
 
         <Button
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/buttonGame"
+            android:id="@+id/buttonGameLeft"
             android:background="@drawable/green_circle"
             android:visibility="invisible"
             android:onClick="clickToButton"
@@ -68,7 +68,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/startGameButton"
+            android:id="@+id/startGameButtonLeft"
             android:background="@drawable/start_game_icon"
             android:onClick="startGame"
             android:layout_centerVertical="true"

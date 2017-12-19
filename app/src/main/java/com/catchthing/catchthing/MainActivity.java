@@ -1,5 +1,6 @@
 package com.catchthing.catchthing;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,13 +14,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
+    private static Context mContext;
     private TextView record;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = getApplicationContext();
         setContentView(R.layout.activity_main);
         Init();
+    }
+
+    public static Context getContext() {
+        return mContext;
     }
 
     private void Init() {
@@ -44,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void readScore() {
         try {
-            FileInputStream fin = openFileInput("score.cc");
+            FileInputStream fin = openFileInput("score_left.cc");
             record.setText(String.valueOf(fin.read()));
             fin.close();
         } catch (IOException e) {
