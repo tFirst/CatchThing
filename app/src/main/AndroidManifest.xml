@@ -16,9 +16,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.catchthing.catchthing.GameLeft" />
+        <activity android:name="com.catchthing.catchthing.games.GameLeft" />
 
-        <activity android:name="com.catchthing.catchthing.GameRight" />
+        <activity android:name="com.catchthing.catchthing.games.GameRight" />
     </application>
 
 </manifest>

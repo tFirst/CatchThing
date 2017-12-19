@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.catchthing.catchthing.games.GameLeft;
+import com.catchthing.catchthing.games.GameRight;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 
