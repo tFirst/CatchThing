@@ -3,26 +3,26 @@ package com.catchthing.catchthing.games;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.catchthing.catchthing.MainActivity;
 import com.catchthing.catchthing.R;
+import com.catchthing.catchthing.status.StateMain;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -39,6 +39,8 @@ public class GameRight extends AppCompatActivity {
     private Button buttonGame;
     private Button startGameButton;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
+    private static Long userId;
+    private static Long record;
 
 
     @Override
@@ -56,8 +58,11 @@ public class GameRight extends AppCompatActivity {
         buttonGame = findViewById(R.id.buttonGameRight);
         textViewScore = findViewById(R.id.textViewScoreRight);
         textViewRecordRight = findViewById(R.id.textViewRecord2);
-        setRecord();
         layoutParamsArrayList = new ArrayList<>();
+
+        userId = getIntent().getLongExtra("userId", 0);
+
+        getStats();
 
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -67,6 +72,12 @@ public class GameRight extends AppCompatActivity {
     private void forBegin() {
         Intent intent = new Intent(this, GameRight.class);
         startActivity(intent);
+    }
+
+    private void getStats() {
+        String url = "http://192.168.1.7:8080/game/getGameRight?userId=" + userId;
+        new HttpRequestTask(url).execute();
+        textViewRecordRight.setText(String.valueOf(record));
     }
 
     protected void start() throws InterruptedException {
@@ -198,42 +209,9 @@ public class GameRight extends AppCompatActivity {
     }
 
     private void saveScore() {
-        String FILENAME = "score_right.cc";
+        String url = "http://192.168.1.7:8080/game/saveGameRight?userId=" + userId + "&record=" + textViewScore.getText();
 
-        try {
-            InputStream inputStream = openFileInput(FILENAME);
-
-            if (inputStream != null) {
-                InputStreamReader isr = new InputStreamReader(inputStream);
-                BufferedReader reader = new BufferedReader(isr);
-                String line;
-                StringBuilder builder = new StringBuilder();
-
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-
-                if (Integer.parseInt(String.valueOf(builder)) < count) {
-                    saveFile(FILENAME);
-                }
-
-                inputStream.close();
-            }
-        } catch (Throwable t) {
-            saveFile(FILENAME);
-        }
-    }
-
-    private void saveFile(String fileName) {
-        try {
-            OutputStream outputStream = openFileOutput(fileName, 0);
-            OutputStreamWriter osw = new OutputStreamWriter(outputStream);
-            osw.write(count);
-            osw.close();
-        } catch (Throwable t) {
-            Toast.makeText(GameRight.this,
-                    "Exception: " + t.toString(), Toast.LENGTH_LONG).show();
-        }
+        new HttpRequestTask(url).execute();
     }
 
     private RelativeLayout.LayoutParams checkLayoutParams
@@ -244,27 +222,34 @@ public class GameRight extends AppCompatActivity {
         return layoutParams;
     }
 
-    private void setRecord() {
-        String FILENAME = "score_right.cc";
+    private static class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
 
-        try {
-            InputStream inputStream = openFileInput(FILENAME);
+        private String url;
 
-            if (inputStream != null) {
-                InputStreamReader isr = new InputStreamReader(inputStream);
-                BufferedReader reader = new BufferedReader(isr);
-                String line = reader.readLine();
+        HttpRequestTask(String url) {
+            this.url = url;
+        }
 
-                if (line != null) {
-                    textViewRecordRight.setText(line);
-                } else {
-                    textViewRecordRight.setText("0");
-                }
-
-                inputStream.close();
+        @Override
+        protected StateMain doInBackground(Void... params) {
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                return restTemplate.getForObject(url, StateMain.class);
+            } catch (Exception e) {
+                Log.e("MainActivity", e.getMessage(), e);
             }
-        } catch (Throwable t) {
-            saveFile(FILENAME);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(StateMain stateMain) {
+            if (stateMain.getGameRightRecord() != null) {
+                record = stateMain.getGameRightRecord();
+            } else {
+                record = 0L;
+            }
         }
     }
 }
