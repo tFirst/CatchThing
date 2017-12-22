@@ -2,7 +2,6 @@ package com.catchthing.catchthing.games;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -37,6 +36,7 @@ public class GameRight extends AppCompatActivity {
     private Button startGameButton;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
     private static Long userId;
+    private Boolean isAlertDialog = false;
 
     private static final String URL = "https://catching.herokuapp.com";
 
@@ -70,7 +70,9 @@ public class GameRight extends AppCompatActivity {
 
     private void forBegin() {
         Intent intent = new Intent(this, GameRight.class);
+        intent.putExtra("userId", userId);
         startActivity(intent);
+        finish();
     }
 
     @SuppressLint("SetTextI18n")
@@ -92,6 +94,7 @@ public class GameRight extends AppCompatActivity {
         }
 
         if (stateMain != null) {
+            userId = stateMain.getUserId();
             textViewRecordRight.setText(stateMain.getGameRightRecord().toString());
         }
     }
@@ -105,7 +108,7 @@ public class GameRight extends AppCompatActivity {
     }
 
     private RelativeLayout.LayoutParams getRandomParams() {
-        int sizeCircles = 70;
+        int sizeCircles = 75;
         RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
         int left, top;
@@ -161,7 +164,8 @@ public class GameRight extends AppCompatActivity {
     }
 
     private void sleep() {
-        countDownTimer = new CountDownTimer(1000, 1000) {
+        countDownTimer = new CountDownTimer(random.nextInt(3500), 1000) {
+
             @Override
             public void onTick(long millisUntilFinished) {
             }
@@ -190,37 +194,37 @@ public class GameRight extends AppCompatActivity {
         }.start();
     }
 
-    protected void showAlertDialog() {
-        if (countDownTimer != null)
-            countDownTimer.cancel();
-        saveScore();
-        String title = "Проигрыш: Вы не успели нажать на кнопку";
-        AlertDialog.Builder builder = new AlertDialog.Builder(GameRight.this);
-        builder.setTitle(title)
-                .setMessage("Ваш счет: " + count)
-                .setCancelable(false)
-                .setPositiveButton("Начать заново",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+    protected synchronized void showAlertDialog() {
+        if (!isAlertDialog) {
+            isAlertDialog = true;
+            if (countDownTimer != null)
+                countDownTimer.cancel();
+            saveScore();
+            String title = "Проигрыш: Вы не успели нажать на кнопку";
+            AlertDialog.Builder builder = new AlertDialog.Builder(GameRight.this);
+            builder.setTitle(title)
+                    .setMessage("Ваш счет: " + count)
+                    .setCancelable(false)
+                    .setPositiveButton("Начать заново",
+                            (dialog, id) -> {
                                 dialog.cancel();
                                 forBegin();
-                            }
-                        })
-                .setNegativeButton("Выход",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            })
+                    .setNegativeButton("Выход",
+                            (dialog, id) -> {
                                 dialog.cancel();
                                 closeGame();
-                            }
-                        });
-        AlertDialog alert = builder.create();
-        alert.show();
-        count = 0;
+                            });
+            AlertDialog alert = builder.create();
+            alert.show();
+            count = 0;
+        }
     }
 
     private void closeGame() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void saveScore() {
@@ -233,5 +237,10 @@ public class GameRight extends AppCompatActivity {
                 textViewScore.getText();
 
         new HttpRequestTask(url).execute();
+    }
+
+    @Override
+    public void onBackPressed() {
+        closeGame();
     }
 }

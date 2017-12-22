@@ -24,13 +24,7 @@
 
         <activity
             android:name="com.catchthing.catchthing.MainActivity"
-            android:hardwareAccelerated="false">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:hardwareAccelerated="false"/>
 
         <activity android:name="com.catchthing.catchthing.games.GameLeft" />
 

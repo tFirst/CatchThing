@@ -3,8 +3,8 @@ package com.catchthing.catchthing.games;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
@@ -39,7 +39,8 @@ public class GameLeft extends AppCompatActivity {
     private ArrayList<Button> buttonNoClickList;
     private View.OnClickListener onClickListener;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
-    private static Long userId;
+    private Long userId;
+    private Boolean isAlertDialog = false;
 
     private static final String URL = "https://catching.herokuapp.com"; // URL сервера
 
@@ -72,17 +73,18 @@ public class GameLeft extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
 
-        onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAlertDialog("miss");
-            }
-        };
+        onClickListener = v -> {
+			if (!isAlertDialog) {
+				showAlertDialog("miss");
+			}
+		};
     }
 
     private void forBegin() {
         Intent intent = new Intent(this, GameLeft.class);
+        intent.putExtra("userId", userId);
         startActivity(intent);
+        finish();
     }
 
     @SuppressLint("SetTextI18n")
@@ -104,6 +106,7 @@ public class GameLeft extends AppCompatActivity {
         }
 
         if (stateMain != null) {
+        	userId = stateMain.getUserId();
             textViewRecord.setText(stateMain.getGameLeftRecord().toString());
         }
     }
@@ -118,7 +121,6 @@ public class GameLeft extends AppCompatActivity {
             button.setOnClickListener(onClickListener);
             button.setBackground(buttonNoClick.getBackground());
             button.setVisibility(View.VISIBLE);
-            button.setText(String.valueOf(i));
             buttonNoClickList.add(button);
             relativeLayout.addView(button);
         }
@@ -130,7 +132,7 @@ public class GameLeft extends AppCompatActivity {
     }
 
     private RelativeLayout.LayoutParams getRandomParams() {
-        int sizeCircles = 70;
+        int sizeCircles = 75;
         RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
         int left, top;
@@ -173,9 +175,13 @@ public class GameLeft extends AppCompatActivity {
     public void clickToButton(View view) {
         count++;
         layoutParamsArrayList.clear();
-        for (int i = 0; i < buttonNoClickList.size(); i++) {
-            buttonNoClickList.get(i).setVisibility(View.GONE);
-        }
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			buttonNoClickList.forEach((b) -> b.setVisibility(View.GONE));
+		} else {
+			for (int i = 0; i < buttonNoClickList.size(); i++) {
+				buttonNoClickList.get(i).setVisibility(View.GONE);
+			}
+		}
         int MAX_DIFFICULTY_LEVEL = 20;
         if (count % 3 == 0)
             if (DIFFICULTY_LEVEL < MAX_DIFFICULTY_LEVEL)
@@ -202,47 +208,50 @@ public class GameLeft extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                showAlertDialog("time");
+				if (!isAlertDialog) {
+					showAlertDialog("time");
+				}
             }
         }.start();
     }
 
-    protected void showAlertDialog(String msg) {
-        if (countDownTimer != null)
-            countDownTimer.cancel();
-        saveScore();
-        String title;
-        if (msg.equals("time")) {
-            title = "Проигрыш: Вы не успели нажать на кнопку";
-        } else {
-            title = "Проигрыш: Вы промахнулись";
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(GameLeft.this);
-        builder.setTitle(title)
-                .setMessage("Ваш счет: " + count)
-                .setCancelable(false)
-                .setPositiveButton("Начать заново",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                                forBegin();
-                            }
-                        })
-                .setNegativeButton("Выход",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                                closeGame();
-                            }
-                        });
-        AlertDialog alert = builder.create();
-        alert.show();
-        count = 0;
+    protected synchronized void showAlertDialog(String msg) {
+    	if (!isAlertDialog) {
+			isAlertDialog = true;
+			if (countDownTimer != null) {
+				countDownTimer.cancel();
+			}
+			saveScore();
+			String title;
+			if (msg.equals("time")) {
+				title = "Проигрыш: Вы не успели нажать на кнопку";
+			} else {
+				title = "Проигрыш: Вы промахнулись";
+			}
+			AlertDialog.Builder builder = new AlertDialog.Builder(GameLeft.this);
+			builder.setTitle(title)
+					.setMessage("Ваш счет: " + count)
+					.setCancelable(false)
+					.setPositiveButton("Начать заново",
+							(dialog, id) -> {
+								dialog.cancel();
+								forBegin();
+							})
+					.setNegativeButton("Выход",
+							(dialog, id) -> {
+								dialog.cancel();
+								closeGame();
+							});
+			AlertDialog alert = builder.create();
+			alert.show();
+			count = 0;
+		}
     }
 
     private void closeGame() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void saveScore() {
@@ -256,4 +265,9 @@ public class GameLeft extends AppCompatActivity {
 
         new HttpRequestTask(url).execute();
     }
+
+	@Override
+	public void onBackPressed() {
+		closeGame();
+	}
 }
