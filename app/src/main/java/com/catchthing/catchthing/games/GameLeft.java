@@ -1,16 +1,15 @@
 package com.catchthing.catchthing.games;
 
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
@@ -19,21 +18,18 @@ import android.widget.TextView;
 
 import com.catchthing.catchthing.MainActivity;
 import com.catchthing.catchthing.R;
+import com.catchthing.catchthing.connect.HttpRequestTask;
 import com.catchthing.catchthing.status.StateMain;
-
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 public class GameLeft extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private int DIFFICULTY_LEVEL;
-    private int MAX_DIFFICULTY_LEVEL = 20;
     private Random random;
     private int count = 0;
-    private int sizeCircles = 70;
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
     private TextView textViewRecord;
@@ -44,7 +40,8 @@ public class GameLeft extends AppCompatActivity {
     private View.OnClickListener onClickListener;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
     private static Long userId;
-    private static Long record;
+
+    private static final String URL = "http://192.168.1.7:8080"; // URL сервера
 
 
     @Override
@@ -88,10 +85,27 @@ public class GameLeft extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @SuppressLint("SetTextI18n")
     private void getStats() {
-        String url = "http://192.168.1.7:8080/game/getGameLeft?userId=" + userId;
-        new HttpRequestTask(url).execute();
-        textViewRecord.setText(String.valueOf(record));
+        StringBuilder url = new StringBuilder()
+                .append(URL)
+                .append("/game")
+                .append("/getGameLeft")
+                .append("?userId=")
+                .append(userId);
+
+        StateMain stateMain = null;
+        try {
+            stateMain = new HttpRequestTask(url.toString()).execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        if (stateMain != null) {
+            textViewRecord.setText(stateMain.getGameLeftRecord().toString());
+        }
     }
 
     protected void start() {
@@ -116,6 +130,7 @@ public class GameLeft extends AppCompatActivity {
     }
 
     private RelativeLayout.LayoutParams getRandomParams() {
+        int sizeCircles = 70;
         RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
         int left, top;
@@ -161,6 +176,7 @@ public class GameLeft extends AppCompatActivity {
         for (int i = 0; i < buttonNoClickList.size(); i++) {
             buttonNoClickList.get(i).setVisibility(View.GONE);
         }
+        int MAX_DIFFICULTY_LEVEL = 20;
         if (count % 3 == 0)
             if (DIFFICULTY_LEVEL < MAX_DIFFICULTY_LEVEL)
                 DIFFICULTY_LEVEL++;
@@ -230,39 +246,14 @@ public class GameLeft extends AppCompatActivity {
     }
 
     private void saveScore() {
-        String url = "http://192.168.1.7:8080/game/saveGameLeft?userId=" + userId + "&record=" + textViewScore.getText();
+        String url = URL +
+                "/game" +
+                "/saveGameLeft" +
+                "?userId=" +
+                userId +
+                "&record=" +
+                textViewScore.getText();
 
         new HttpRequestTask(url).execute();
-    }
-
-    private static class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
-
-        private String url;
-
-        HttpRequestTask(String url) {
-            this.url = url;
-        }
-
-        @Override
-        protected StateMain doInBackground(Void... params) {
-            try {
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                return restTemplate.getForObject(url, StateMain.class);
-            } catch (Exception e) {
-                Log.e("MainActivity", e.getMessage(), e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(StateMain stateMain) {
-            if (stateMain.getGameLeftRecord() != null) {
-                record = stateMain.getGameLeftRecord();
-            } else {
-                record = 0L;
-            }
-        }
     }
 }
