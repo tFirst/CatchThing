@@ -38,7 +38,7 @@ public class GameRight extends AppCompatActivity {
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
     private static Long userId;
 
-    private static final String URL = "http://192.168.1.7:8080";
+    private static final String URL = "https://catching.herokuapp.com";
 
 
     @Override
