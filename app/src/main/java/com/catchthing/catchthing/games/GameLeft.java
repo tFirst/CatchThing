@@ -41,7 +41,7 @@ public class GameLeft extends AppCompatActivity {
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
     private static Long userId;
 
-    private static final String URL = "http://192.168.1.7:8080"; // URL сервера
+    private static final String URL = "https://catching.herokuapp.com"; // URL сервера
 
 
     @Override

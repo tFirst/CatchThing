@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
 
     private static final StringBuilder URL = new StringBuilder()
-            .append("http://192.168.1.7:8080");
+            .append("https://catching.herokuapp.com");
     private static Long userId;
 
     @Override
