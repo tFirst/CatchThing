@@ -71,42 +71,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goGameLeft(View view) {
-        StringBuilder url = new StringBuilder()
-                .append(URL)
-                .append("/game")
-                .append("/getGameLeft")
-                .append("?userId=")
-                .append(userId);
-
-        StateMain stateMain = getDatas(url);
-
-        System.out.println("STATE MAIN LEFT : " + stateMain);
-
         Intent intent = new Intent(this, GameLeft.class);
         intent.putExtra("userId", userId);
-        if (stateMain != null) {
-            intent.putExtra("record", stateMain.getGameLeftRecord());
-        }
-
         startActivity(intent);
+        finish();
     }
 
     public void goGameRight(View view) {
-        StringBuilder url = new StringBuilder()
-                .append(URL)
-                .append("/game")
-                .append("/getGameRight")
-                .append("?userId=")
-                .append(userId);
-
-        StateMain stateMain = getDatas(url);
-
         Intent intent = new Intent(this, GameRight.class);
         intent.putExtra("userId", userId);
-        if (stateMain != null) {
-            intent.putExtra("record", stateMain.getGameRightRecord());
-        }
-
         startActivity(intent);
+        finish();
     }
 }

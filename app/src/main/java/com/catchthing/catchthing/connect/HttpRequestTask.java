@@ -22,10 +22,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-			System.out.println(restTemplate.getMessageConverters());
-			StateMain stateMain = restTemplate.getForObject(url, StateMain.class);
-			System.out.println(stateMain);
-			return stateMain;
+			return restTemplate.getForObject(url, StateMain.class);
 		} catch (Exception e) {
 			Log.e("MainActivity", e.getMessage(), e);
 		}
