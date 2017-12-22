@@ -1,15 +1,14 @@
 package com.catchthing.catchthing.games;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
@@ -18,13 +17,12 @@ import android.widget.TextView;
 
 import com.catchthing.catchthing.MainActivity;
 import com.catchthing.catchthing.R;
+import com.catchthing.catchthing.connect.HttpRequestTask;
 import com.catchthing.catchthing.status.StateMain;
-
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 
 public class GameRight extends AppCompatActivity {
@@ -32,7 +30,6 @@ public class GameRight extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private Random random;
     private int count = 0;
-    private int sizeCircles = 70;
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
     private TextView textViewRecordRight;
@@ -40,7 +37,8 @@ public class GameRight extends AppCompatActivity {
     private Button startGameButton;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
     private static Long userId;
-    private static Long record;
+
+    private static final String URL = "http://192.168.1.7:8080";
 
 
     @Override
@@ -57,6 +55,7 @@ public class GameRight extends AppCompatActivity {
         startGameButton = findViewById(R.id.startGameButtonRight);
         buttonGame = findViewById(R.id.buttonGameRight);
         textViewScore = findViewById(R.id.textViewScoreRight);
+        textViewScore.setText("0");
         textViewRecordRight = findViewById(R.id.textViewRecord2);
         layoutParamsArrayList = new ArrayList<>();
 
@@ -74,23 +73,39 @@ public class GameRight extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @SuppressLint("SetTextI18n")
     private void getStats() {
-        String url = "http://192.168.1.7:8080/game/getGameRight?userId=" + userId;
-        new HttpRequestTask(url).execute();
-        textViewRecordRight.setText(String.valueOf(record));
+        StringBuilder url = new StringBuilder()
+                .append(URL)
+                .append("/game")
+                .append("/getGameRight")
+                .append("?userId=")
+                .append(userId);
+
+        StateMain stateMain = null;
+        try {
+            stateMain = new com.catchthing.catchthing.connect.HttpRequestTask(url.toString()).execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        if (stateMain != null) {
+            textViewRecordRight.setText(stateMain.getGameRightRecord().toString());
+        }
     }
 
     protected void start() throws InterruptedException {
         System.out.println("for green");
         layoutParamsArrayList.add(getRandomParams());
-        buttonGame.setLayoutParams(checkLayoutParams
-                (layoutParamsArrayList.get(layoutParamsArrayList.size() - 1),
-                        layoutParamsArrayList.size() - 1));
+        buttonGame.setLayoutParams(layoutParamsArrayList.get(layoutParamsArrayList.size() - 1));
         buttonGame.setVisibility(View.VISIBLE);
         startTimer();
     }
 
     private RelativeLayout.LayoutParams getRandomParams() {
+        int sizeCircles = 70;
         RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
         int left, top;
@@ -209,47 +224,14 @@ public class GameRight extends AppCompatActivity {
     }
 
     private void saveScore() {
-        String url = "http://192.168.1.7:8080/game/saveGameRight?userId=" + userId + "&record=" + textViewScore.getText();
+        String url = URL +
+                "/game" +
+                "/saveGameRight" +
+                "?userId=" +
+                userId +
+                "&record=" +
+                textViewScore.getText();
 
         new HttpRequestTask(url).execute();
-    }
-
-    private RelativeLayout.LayoutParams checkLayoutParams
-            (RelativeLayout.LayoutParams layoutParams, int number) {
-        if (layoutParamsArrayList.size() != 0) {
-
-        }
-        return layoutParams;
-    }
-
-    private static class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
-
-        private String url;
-
-        HttpRequestTask(String url) {
-            this.url = url;
-        }
-
-        @Override
-        protected StateMain doInBackground(Void... params) {
-            try {
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                return restTemplate.getForObject(url, StateMain.class);
-            } catch (Exception e) {
-                Log.e("MainActivity", e.getMessage(), e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(StateMain stateMain) {
-            if (stateMain.getGameRightRecord() != null) {
-                record = stateMain.getGameRightRecord();
-            } else {
-                record = 0L;
-            }
-        }
     }
 }
