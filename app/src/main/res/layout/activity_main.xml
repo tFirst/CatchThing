@@ -7,46 +7,41 @@
     android:background="@drawable/main_menu_background_game"
     tools:context="com.catchthing.catchthing.MainActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <com.catchthing.catchthing.GifView
+        android:id="@+id/gifview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/buttonGameRules"
-            android:layout_width="250px"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="68dp"
-            android:background="@android:drawable/button_onoff_indicator_on"
-            android:text="@string/gameRulesButtonDescription" />
+    <RelativeLayout
+        android:id="@+id/relativeLayoutMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="UselessParent">
 
         <Button
             android:id="@+id/buttonGoGame"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/buttonGameRules"
-            android:layout_toRightOf="@+id/buttonGameRules"
-            android:background="@drawable/arrow_right"
-            android:onClick="goGameRight" />
-
-        <com.catchthing.catchthing.GifView
-            android:id="@+id/gifview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/button"
+            android:layout_alignBottom="@+id/button"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/arrow_right"
+            android:onClick="goGameRight"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="72dp"
-            android:fontFamily="casual"
-            android:text="@string/app_name"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="50dp"
+            android:fontFamily="cursive"
+            android:text="@string/appDesc"
             android:textAlignment="center"
             android:textColor="@android:color/holo_green_dark"
-            android:textSize="32sp"
+            android:textSize="60sp"
             android:textStyle="bold"
             android:typeface="normal"
             android:visibility="visible"
@@ -54,13 +49,43 @@
 
         <Button
             android:id="@+id/button"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/buttonGameRules"
-            android:layout_toStartOf="@+id/buttonGameRules"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textView2"
+            android:layout_marginTop="76dp"
             android:background="@drawable/arrow_left"
-            android:onClick="goGameLeft" />
+            android:onClick="goGameLeft"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/textViewGoGame"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/buttonGoGame"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="cursive"
+            android:text="@string/descGo"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="24dp"
+            android:fontFamily="cursive"
+            android:text="@string/descCollect"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="40sp"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 

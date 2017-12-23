@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -32,6 +31,7 @@ public class GameRight extends AppCompatActivity {
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
     private TextView textViewRecordRight;
+    private TextView textViewDesc;
     private Button buttonGame;
     private Button startGameButton;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
@@ -51,9 +51,9 @@ public class GameRight extends AppCompatActivity {
     private void Init() {
         random = new Random();
         relativeLayout = findViewById(R.id.relativeLayoutGameRight);
-        relativeLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.background));
         startGameButton = findViewById(R.id.startGameButtonRight);
         buttonGame = findViewById(R.id.buttonGameRight);
+        textViewDesc = findViewById(R.id.textViewDesc);
         textViewScore = findViewById(R.id.textViewScoreRight);
         textViewScore.setText("0");
         textViewRecordRight = findViewById(R.id.textViewRecord2);
@@ -119,10 +119,10 @@ public class GameRight extends AppCompatActivity {
         left = random.nextInt(relativeLayout.getWidth());
         if (left > sizeCircles)
             if (left < relativeLayout.getWidth() - sizeCircles) {
-                System.out.println("norm left");
+                System.out.println("norm game_left");
                 layoutParams.leftMargin = left;
             } else {
-                System.out.println("left " + left + " > l gr");
+                System.out.println("game_left " + left + " > l gr");
                 layoutParams.leftMargin = left - (sizeCircles - (relativeLayout.getWidth() - left - 1));
             }
         else {
@@ -160,7 +160,8 @@ public class GameRight extends AppCompatActivity {
 
     public void startGame(View view) throws InterruptedException {
         startGameButton.setVisibility(View.GONE);
-        start();
+        textViewDesc.setVisibility(View.GONE);
+        sleep();
     }
 
     private void sleep() {
@@ -182,7 +183,7 @@ public class GameRight extends AppCompatActivity {
     }
 
     private void startTimer() {
-        countDownTimer = new CountDownTimer(1000, 1000) {
+        countDownTimer = new CountDownTimer(700, 700) {
             @Override
             public void onTick(long millisUntilFinished) {
             }
@@ -199,7 +200,9 @@ public class GameRight extends AppCompatActivity {
             isAlertDialog = true;
             if (countDownTimer != null)
                 countDownTimer.cancel();
-            saveScore();
+            if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecordRight.getText().toString())) {
+                saveScore();
+            }
             String title = "Проигрыш: Вы не успели нажать на кнопку";
             AlertDialog.Builder builder = new AlertDialog.Builder(GameRight.this);
             builder.setTitle(title)
@@ -241,6 +244,9 @@ public class GameRight extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecordRight.getText().toString())) {
+            saveScore();
+        }
         closeGame();
     }
 }

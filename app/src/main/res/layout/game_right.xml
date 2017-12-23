@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="7"
+    android:weightSum="8"
     android:id="@+id/linearLayout">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="67dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@drawable/games_background">
 
         <TextView
             android:id="@+id/textView4"
@@ -21,7 +23,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginLeft="15dp"
             android:layout_marginStart="15dp"
-            android:text="Рекорд:"
+            android:text="@string/recordText"
             android:textSize="24sp" />
 
         <TextView
@@ -48,49 +50,74 @@
             android:textSize="24sp" />
 
         <TextView
-            android:text="@string/scoresTextLabelGameRight"
+            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="19dp"
+            android:layout_marginRight="19dp"
             android:layout_toLeftOf="@+id/textViewScoreRight"
             android:layout_toStartOf="@+id/textViewScoreRight"
-            android:layout_marginRight="19dp"
-            android:layout_marginEnd="19dp"
-            android:id="@+id/textView"
-            android:textSize="24sp" />
+            android:text="@string/scoresTextLabelGameRight"
+            android:textSize="24sp"
+            tools:ignore="RelativeOverlap" />
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_weight="6"
+        android:id="@+id/relativeLayoutGameRight"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/relativeLayoutGameRight"
-        android:layout_marginEnd="0dp"
-        android:layout_marginRight="50dp"
         android:layout_marginBottom="0dp"
+        android:layout_marginEnd="0dp"
         android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
         android:layout_marginStart="0dp"
-        android:background="@android:color/darker_gray">
+        android:layout_weight="6"
+        android:background="@drawable/games_background"
+        android:visibility="visible">
 
         <Button
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/buttonGameRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/green_circle"
-            android:visibility="invisible"
             android:onClick="clickToButtonRight"
+            android:visibility="invisible"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
+            android:id="@+id/startGameButtonRight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/startGameButtonRight"
-            android:background="@drawable/start_game_icon"
-            android:onClick="startGame"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:background="@drawable/start_game_icon"
+            android:onClick="startGame" />
+
+        <TextView
+            android:id="@+id/textViewDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/buttonGameRight"
+            android:layout_alignBottom="@+id/buttonGameRight"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:fontFamily="serif"
+            android:text="@string/descriptionGameRight"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="#5e2103"
+            android:textSize="26sp"
+            android:textStyle="italic" />
 
     </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="67dp"
+        android:layout_weight="1"
+        android:background="@drawable/games_background" />
 
 </LinearLayout>

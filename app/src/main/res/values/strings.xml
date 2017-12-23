@@ -1,7 +1,13 @@
 <resources>
-    <string name="app_name">Catch me if you can</string>
+    <string name="app_name">Sweet rush</string>
+    <string name="appDesc">Welcome to Sweet Rush!</string>
     <string name="gameRulesButtonDescription">Правила игры</string>
     <string name="yourRecordLabelDescription">Ваш рекорд:</string>
     <string name="gameLeftScoreLabelDescription">Очки:</string>
     <string name="scoresTextLabelGameRight">Очки:</string>
+    <string name="recordText">Рекорд:</string>
+    <string name="descriptionGameLeft">У тебя всего 1 секунда, чтобы взять леденец. Собирай только зеленые!</string>
+    <string name="descriptionGameRight">Никто не знает, когда появится очередной леденец. Собери как можно больше!</string>
+    <string name="descGo">We go for candies?</string>
+    <string name="descCollect">Collect them all!</string>
 </resources>
