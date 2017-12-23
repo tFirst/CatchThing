@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 
 import com.catchthing.catchthing.MainActivity;
 import com.catchthing.catchthing.R;
+import com.catchthing.catchthing.calculate.Point;
 import com.catchthing.catchthing.connect.HttpRequestTask;
 import com.catchthing.catchthing.status.StateMain;
 
@@ -33,6 +33,7 @@ public class GameLeft extends AppCompatActivity {
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
     private TextView textViewRecord;
+    private TextView textViewDesc;
     private Button buttonGame;
     private Button buttonNoClick;
     private Button startGameButton;
@@ -55,12 +56,12 @@ public class GameLeft extends AppCompatActivity {
     private void Init() {
         random = new Random();
         relativeLayout = findViewById(R.id.relativeLayoutGameLeft);
-        relativeLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.background));
         startGameButton = findViewById(R.id.startGameButtonLeft);
         buttonNoClick = findViewById(R.id.buttonNoClick);
         buttonGame = findViewById(R.id.buttonGameLeft);
         textViewScore = findViewById(R.id.textViewScoreLeft);
         textViewScore.setText("0");
+        textViewDesc = findViewById(R.id.textViewDesc);
         textViewRecord = findViewById(R.id.textViewRecord);
         buttonNoClickList = new ArrayList<>();
         layoutParamsArrayList = new ArrayList<>();
@@ -143,10 +144,10 @@ public class GameLeft extends AppCompatActivity {
         left = random.nextInt(relativeLayout.getWidth());
         if (left > sizeCircles)
             if (left < relativeLayout.getWidth() - sizeCircles) {
-                System.out.println("norm left");
+                System.out.println("norm game_left");
                 layoutParams.leftMargin = left;
             } else {
-                System.out.println("left " + left + " > l gr");
+                System.out.println("game_left " + left + " > l gr");
                 layoutParams.leftMargin = left - (sizeCircles - (relativeLayout.getWidth() - left - 1));
             }
         else {
@@ -169,8 +170,22 @@ public class GameLeft extends AppCompatActivity {
         }
         System.out.println("rand l " + left + " rand t " + top);
         System.out.println("lp l " + layoutParams.leftMargin + " lp t " + layoutParams.topMargin);
-        return layoutParams;
+        return checkParams(layoutParams);
     }
+
+    private RelativeLayout.LayoutParams checkParams(RelativeLayout.LayoutParams layoutParams) {
+    	for (RelativeLayout.LayoutParams params : layoutParamsArrayList) {
+			Point pointOne = new Point(params.leftMargin, params.topMargin);
+			Point pointTwo = new Point(layoutParams.leftMargin, layoutParams.topMargin);
+
+			double diff = pointOne.getDistance(pointTwo);
+			if (diff < 30) {
+				layoutParams = getRandomParams();
+			}
+		}
+
+		return layoutParams;
+	}
 
     public void clickToButton(View view) {
         count++;
@@ -197,6 +212,7 @@ public class GameLeft extends AppCompatActivity {
     public void startGame(View view) {
         DIFFICULTY_LEVEL = 0;
         startGameButton.setVisibility(View.GONE);
+        textViewDesc.setVisibility(View.GONE);
         start();
     }
 
@@ -221,12 +237,14 @@ public class GameLeft extends AppCompatActivity {
 			if (countDownTimer != null) {
 				countDownTimer.cancel();
 			}
-			saveScore();
+			if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecord.getText().toString())) {
+				saveScore();
+			}
 			String title;
 			if (msg.equals("time")) {
-				title = "Проигрыш: Вы не успели нажать на кнопку";
+				title = "Вы не успели нажать на кнопку";
 			} else {
-				title = "Проигрыш: Вы промахнулись";
+				title = "Вы промахнулись";
 			}
 			AlertDialog.Builder builder = new AlertDialog.Builder(GameLeft.this);
 			builder.setTitle(title)
@@ -268,6 +286,9 @@ public class GameLeft extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
+		if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecord.getText().toString())) {
+			saveScore();
+		}
 		closeGame();
 	}
 }
