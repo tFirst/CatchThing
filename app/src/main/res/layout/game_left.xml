@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="67dp"
         android:layout_weight="1"
-        android:background="@drawable/games_background">
+        android:background="@drawable/header">
 
         <TextView
             android:id="@+id/textView3"
@@ -96,10 +96,11 @@
 
         <Button
             android:id="@+id/startGameButtonLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_below="@+id/textViewDesc"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
+            android:layout_marginTop="98dp"
             android:background="@drawable/start_game_icon"
             android:onClick="startGame" />
 
@@ -126,6 +127,6 @@
         android:layout_width="match_parent"
         android:layout_height="67dp"
         android:layout_weight="1"
-        android:background="@drawable/games_background" />
+        android:background="@drawable/footer" />
 
 </LinearLayout>

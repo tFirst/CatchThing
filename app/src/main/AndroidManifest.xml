@@ -29,6 +29,10 @@
         <activity android:name="com.catchthing.catchthing.games.GameLeft" />
 
         <activity android:name="com.catchthing.catchthing.games.GameRight" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

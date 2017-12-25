@@ -8,6 +8,6 @@
     <string name="recordText">Рекорд:</string>
     <string name="descriptionGameLeft">У тебя всего 1 секунда, чтобы взять леденец. Собирай только зеленые!</string>
     <string name="descriptionGameRight">Никто не знает, когда появится очередной леденец. Собери как можно больше!</string>
-    <string name="descGo">We go for candies?</string>
-    <string name="descCollect">Collect them all!</string>
+    <string name="descGo">Begin?</string>
+    <string name="descCollect">Can you collect them all?</string>
 </resources>
