@@ -18,56 +18,77 @@ import com.catchthing.catchthing.R;
 import com.catchthing.catchthing.connect.HttpRequestTask;
 import com.catchthing.catchthing.status.StateMain;
 
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-
+// игра справа
 public class GameRight extends AppCompatActivity {
-    private final GameRight gameRight = this;
+
+    private GameRight gameRight = this;
+
+    private static final String URL = "https://catching.herokuapp.com"; // URL сервера
+    private static Long userId;
+    private int count = 0;
+    private Long record;
+
     private CountDownTimer countDownTimer;
     private Random random;
-    private int count = 0;
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
     private TextView textViewRecordRight;
     private TextView textViewDesc;
     private Button buttonGame;
     private Button startGameButton;
-    private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
-    private static Long userId;
     private Boolean isAlertDialog = false;
-
-    private static final String URL = "https://catching.herokuapp.com";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.game_right);
-        Init();
+        if (savedInstanceState == null) {
+            Init();
+        }
     }
 
+    // инициализация компонентов активности
     private void Init() {
-        random = new Random();
-        relativeLayout = findViewById(R.id.relativeLayoutGameRight);
-        startGameButton = findViewById(R.id.startGameButtonRight);
-        buttonGame = findViewById(R.id.buttonGameRight);
-        textViewDesc = findViewById(R.id.textViewDesc);
-        textViewScore = findViewById(R.id.textViewScoreRight);
-        textViewScore.setText("0");
-        textViewRecordRight = findViewById(R.id.textViewRecord2);
-        layoutParamsArrayList = new ArrayList<>();
-
-        userId = getIntent().getLongExtra("userId", 0);
-
+        // получение данных с сервера
         getStats();
 
+        setContentView(R.layout.game_right); // определение самой активности
+
+        random = new Random(); // random
+        relativeLayout = findViewById(R.id.relativeLayoutGameRight); // layout, на котором происходят все действия
+        startGameButton = findViewById(R.id.startGameButtonRight); // кнопка GO начала игры
+        buttonGame = findViewById(R.id.buttonGameRight); // зелено-белая кнопка
+        textViewDesc = findViewById(R.id.textViewDesc); // правила игры
+        textViewScore = findViewById(R.id.textViewScoreRight); // поле для вывода текущих очков
+        textViewScore.setText(String.valueOf(0)); // заполняем нулем перед игрой
+        textViewRecordRight = findViewById(R.id.textViewRecordRight); // поле для вывода рекорда игры
+        textViewRecordRight.setText(String.valueOf(record)); // заполнение поля с рекордом
+
+        userId = getIntent().getLongExtra("userId", 0); // userId
+
+        // определение параметров дисплея телефона
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putLong("userId", userId);
+        savedInstanceState.putLong("record", record);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        userId = savedInstanceState.getLong("userId");
+        record = savedInstanceState.getLong("record");
+    }
+
+    // начинаем игру заново
     private void forBegin() {
         Intent intent = new Intent(this, GameRight.class);
         intent.putExtra("userId", userId);
@@ -75,6 +96,7 @@ public class GameRight extends AppCompatActivity {
         finish();
     }
 
+    // получение данных с сервера
     @SuppressLint("SetTextI18n")
     private void getStats() {
         StringBuilder url = new StringBuilder()
@@ -86,7 +108,7 @@ public class GameRight extends AppCompatActivity {
 
         StateMain stateMain = null;
         try {
-            stateMain = new com.catchthing.catchthing.connect.HttpRequestTask(url.toString()).execute().get();
+            stateMain = new HttpRequestTask(url.toString()).execute().get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -95,18 +117,20 @@ public class GameRight extends AppCompatActivity {
 
         if (stateMain != null) {
             userId = stateMain.getUserId();
-            textViewRecordRight.setText(stateMain.getGameRightRecord().toString());
+            record = stateMain.getGameRightRecord();
         }
     }
 
+    // начало игры
     protected void start() throws InterruptedException {
         System.out.println("for green");
-        layoutParamsArrayList.add(getRandomParams());
-        buttonGame.setLayoutParams(layoutParamsArrayList.get(layoutParamsArrayList.size() - 1));
+        buttonGame.setLayoutParams(getRandomParams());
         buttonGame.setVisibility(View.VISIBLE);
+        buttonGame.setEnabled(true);
         startTimer();
     }
 
+    // определяем координаты для кнопки
     private RelativeLayout.LayoutParams getRandomParams() {
         int sizeCircles = 75;
         RelativeLayout.LayoutParams layoutParams =
@@ -148,24 +172,27 @@ public class GameRight extends AppCompatActivity {
         return layoutParams;
     }
 
+    // обработчик нажатия на зелено-белую кнопку
     public void clickToButtonRight(View view) throws InterruptedException {
         buttonGame.setVisibility(View.INVISIBLE);
         count++;
-        layoutParamsArrayList.clear();
-        if (countDownTimer != null)
+        if (countDownTimer != null) {
             countDownTimer.cancel();
+        }
         textViewScore.setText(String.valueOf(count));
         sleep();
     }
 
+    // обработка нажатия на кнопку GO
     public void startGame(View view) throws InterruptedException {
         startGameButton.setVisibility(View.GONE);
         textViewDesc.setVisibility(View.GONE);
         sleep();
     }
 
+    // определяем, через какое время кнопка появится снова
     private void sleep() {
-        countDownTimer = new CountDownTimer(random.nextInt(3500), 1000) {
+        countDownTimer = new CountDownTimer(random.nextInt(3500), 3500) {
 
             @Override
             public void onTick(long millisUntilFinished) {
@@ -182,6 +209,7 @@ public class GameRight extends AppCompatActivity {
         }.start();
     }
 
+    // запуск таймера на нажатие кнопки
     private void startTimer() {
         countDownTimer = new CountDownTimer(700, 700) {
             @Override
@@ -195,14 +223,22 @@ public class GameRight extends AppCompatActivity {
         }.start();
     }
 
+    // вывод диалога о результатах игры
     protected synchronized void showAlertDialog() {
         if (!isAlertDialog) {
+
+            buttonGame.setEnabled(false);
             isAlertDialog = true;
-            if (countDownTimer != null)
+
+            if (countDownTimer != null) {
                 countDownTimer.cancel();
-            if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecordRight.getText().toString())) {
+            }
+
+            if (Long.parseLong(textViewScore.getText().toString()) >
+                    Long.parseLong(textViewRecordRight.getText().toString())) {
                 saveScore();
             }
+
             String title = "Проигрыш: Вы не успели нажать на кнопку";
             AlertDialog.Builder builder = new AlertDialog.Builder(GameRight.this);
             builder.setTitle(title)
@@ -218,18 +254,22 @@ public class GameRight extends AppCompatActivity {
                                 dialog.cancel();
                                 closeGame();
                             });
+
             AlertDialog alert = builder.create();
             alert.show();
+
             count = 0;
         }
     }
 
+    // выход в главное меню
     private void closeGame() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
+    // передача рекорда на сервер
     private void saveScore() {
         String url = URL +
                 "/game" +
@@ -242,9 +282,11 @@ public class GameRight extends AppCompatActivity {
         new HttpRequestTask(url).execute();
     }
 
+    // обработка нажатия на кнопку "Назад" телефона
     @Override
     public void onBackPressed() {
-        if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecordRight.getText().toString())) {
+        if (Long.parseLong(textViewScore.getText().toString()) >
+                Long.parseLong(textViewRecordRight.getText().toString())) {
             saveScore();
         }
         closeGame();

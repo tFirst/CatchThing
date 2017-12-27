@@ -17,24 +17,26 @@ import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final StringBuilder URL = new StringBuilder()
-            .append("https://catching.herokuapp.com");
+    private static final String URL = "https://catching.herokuapp.com";
     private static Long userId;
+    private String deviceId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        //findViewById(R.id.gifview);
-        Init();
+
+        if (savedInstanceState == null) {
+            Init();
+        }
     }
 
+    @SuppressLint("HardwareIds")
     private void Init() {
-        @SuppressLint("HardwareIds")
-        String deviceId = Settings.Secure.getString(getContentResolver(),
-                Settings.Secure.ANDROID_ID);
 
-        System.out.println("DEVICE ID =" + deviceId);
+        setContentView(R.layout.activity_main);
+
+        deviceId = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
 
         StringBuilder url = new StringBuilder()
                 .append(URL)
@@ -43,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
                 .append("?deviceId=")
                 .append(deviceId);
 
-        System.out.println(url);
-
         StateMain stateMain = getDatas(url);
 
         if (stateMain != null) {
@@ -52,8 +52,19 @@ public class MainActivity extends AppCompatActivity {
         } else {
             userId = 0L;
         }
+    }
 
-        System.out.println(userId);
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        deviceId = savedInstanceState.getString("deviceId");
+        userId = savedInstanceState.getLong("userId");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString("deviceId", deviceId);
+        savedInstanceState.putLong("userId", userId);
     }
 
     private StateMain getDatas(StringBuilder url) {
