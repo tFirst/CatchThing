@@ -8,15 +8,17 @@ import com.catchthing.catchthing.status.StateMain;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+// REST-соединение с сервером
 public class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
 
+	// запрос на сервер
 	private String url;
 
 	public HttpRequestTask(String url) {
 		this.url = url;
-		System.out.println(this.url);
 	}
 
+	// передача запроса на сервер
 	@Override
 	protected StateMain doInBackground(Void... params) {
 		try {
@@ -24,7 +26,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			return restTemplate.getForObject(url, StateMain.class);
 		} catch (Exception e) {
-			Log.e("MainActivity", e.getMessage(), e);
+			Log.e("HttpRequestTask", e.getMessage(), e);
 		}
 
 		return null;

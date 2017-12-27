@@ -25,11 +25,17 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
+// игра слева
 public class GameLeft extends AppCompatActivity {
+
+	private static final String URL = "https://catching.herokuapp.com"; // URL сервера
+	private int DIFFICULTY_LEVEL; // уровень сложности (max = 20)
+	private int count = 0;
+	private Long userId;
+	private Long record;
+
     private CountDownTimer countDownTimer;
-    private int DIFFICULTY_LEVEL;
     private Random random;
-    private int count = 0;
     private RelativeLayout relativeLayout;
     private TextView textViewScore;
     private TextView textViewRecord;
@@ -40,40 +46,46 @@ public class GameLeft extends AppCompatActivity {
     private ArrayList<Button> buttonNoClickList;
     private View.OnClickListener onClickListener;
     private ArrayList<RelativeLayout.LayoutParams> layoutParamsArrayList;
-    private Long userId;
     private Boolean isAlertDialog = false;
-
-    private static final String URL = "https://catching.herokuapp.com"; // URL сервера
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.game_left);
-        Init();
+        if (savedInstanceState == null) {
+			Init();
+		}
     }
 
+    // инициализация компонентов активности
     private void Init() {
-        random = new Random();
-        relativeLayout = findViewById(R.id.relativeLayoutGameLeft);
-        startGameButton = findViewById(R.id.startGameButtonLeft);
-        buttonNoClick = findViewById(R.id.buttonNoClick);
-        buttonGame = findViewById(R.id.buttonGameLeft);
-        textViewScore = findViewById(R.id.textViewScoreLeft);
-        textViewScore.setText("0");
-        textViewDesc = findViewById(R.id.textViewDesc);
-        textViewRecord = findViewById(R.id.textViewRecord);
-        buttonNoClickList = new ArrayList<>();
-        layoutParamsArrayList = new ArrayList<>();
+    	// userId
+		userId = getIntent().getLongExtra("userId", 0);
 
-        userId = getIntent().getLongExtra("userId", 0);
+    	// получение данных с сервера
+		getStats();
 
-        getStats();
+		setContentView(R.layout.game_left); // определение самой активности
 
+        random = new Random(); // random
+        relativeLayout = findViewById(R.id.relativeLayoutGameLeft); // layout, на котором происходят основные действия
+        startGameButton = findViewById(R.id.startGameButtonLeft); // кнопка GO
+        buttonNoClick = findViewById(R.id.buttonNoClick); // красно-белые кнопки
+        buttonGame = findViewById(R.id.buttonGameLeft); // зелено-бела кнопка
+        textViewScore = findViewById(R.id.textViewScoreLeft); // поле для вывода текущих очков
+        textViewScore.setText(String.valueOf(0)); // заполняется нулем перед началом игры
+        textViewDesc = findViewById(R.id.textViewDesc); // правила игры
+        textViewRecord = findViewById(R.id.textViewRecord); // поле для вывода рекорда
+        textViewRecord.setText(String.valueOf(record)); // заполнение поля с рекордом
+        buttonNoClickList = new ArrayList<>(); // список красно-белых кнопок
+        layoutParamsArrayList = new ArrayList<>(); // список координат кнопок на relativeLayout
+
+		// определение параметров экрана телефона
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
 
+        // создаем слушателя для красно-белых кнопок
         onClickListener = v -> {
 			if (!isAlertDialog) {
 				showAlertDialog("miss");
@@ -81,6 +93,20 @@ public class GameLeft extends AppCompatActivity {
 		};
     }
 
+    @Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putLong("userId", userId);
+		savedInstanceState.putLong("record", record);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+    	userId = savedInstanceState.getLong("userId");
+    	record = savedInstanceState.getLong("record");
+	}
+
+	// начинаем игру заново
     private void forBegin() {
         Intent intent = new Intent(this, GameLeft.class);
         intent.putExtra("userId", userId);
@@ -88,6 +114,7 @@ public class GameLeft extends AppCompatActivity {
         finish();
     }
 
+    // получаем данные с сервера
     @SuppressLint("SetTextI18n")
     private void getStats() {
         StringBuilder url = new StringBuilder()
@@ -108,10 +135,11 @@ public class GameLeft extends AppCompatActivity {
 
         if (stateMain != null) {
         	userId = stateMain.getUserId();
-            textViewRecord.setText(stateMain.getGameLeftRecord().toString());
+            record = stateMain.getGameLeftRecord();
         }
     }
 
+    // начало игры
     protected void start() {
         for (int i = 0; i < (DIFFICULTY_LEVEL + 1); i++) {
             Button button = new Button(this);
@@ -132,8 +160,9 @@ public class GameLeft extends AppCompatActivity {
         startTimer();
     }
 
+    // определение координат для кнопок на relativeLayout
     private RelativeLayout.LayoutParams getRandomParams() {
-        int sizeCircles = 75;
+        int sizeCircles = 75; // размер кнопок
         RelativeLayout.LayoutParams layoutParams =
                 new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
         int left, top;
@@ -173,6 +202,7 @@ public class GameLeft extends AppCompatActivity {
         return checkParams(layoutParams);
     }
 
+    // проверка наслаивания кнопок друг на друга
     private RelativeLayout.LayoutParams checkParams(RelativeLayout.LayoutParams layoutParams) {
     	for (RelativeLayout.LayoutParams params : layoutParamsArrayList) {
 			Point pointOne = new Point(params.leftMargin, params.topMargin);
@@ -187,6 +217,7 @@ public class GameLeft extends AppCompatActivity {
 		return layoutParams;
 	}
 
+	// обработка нажатия на зелено-белую кнопку
     public void clickToButton(View view) {
         count++;
         layoutParamsArrayList.clear();
@@ -209,6 +240,7 @@ public class GameLeft extends AppCompatActivity {
         start();
     }
 
+    // обработка нажатия на кнопку GO
     public void startGame(View view) {
         DIFFICULTY_LEVEL = 0;
         startGameButton.setVisibility(View.GONE);
@@ -216,6 +248,7 @@ public class GameLeft extends AppCompatActivity {
         start();
     }
 
+    // запуск таймера на нажатие кнопки
     private void startTimer() {
         countDownTimer = new CountDownTimer(1000, 1000) {
             @Override
@@ -231,6 +264,7 @@ public class GameLeft extends AppCompatActivity {
         }.start();
     }
 
+    // вывод диалога с результатами игры
     protected synchronized void showAlertDialog(String msg) {
     	if (!isAlertDialog) {
 			isAlertDialog = true;
@@ -266,12 +300,15 @@ public class GameLeft extends AppCompatActivity {
 		}
     }
 
+    // закрываем активность
     private void closeGame() {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("userId", userId);
         startActivity(intent);
         finish();
     }
 
+    // отправка рекорда на сервер
     private void saveScore() {
         String url = URL +
                 "/game" +
@@ -284,9 +321,11 @@ public class GameLeft extends AppCompatActivity {
         new HttpRequestTask(url).execute();
     }
 
+    // обработка нажатия кнопки "Назад"
 	@Override
 	public void onBackPressed() {
-		if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecord.getText().toString())) {
+    	Long currentScore = Long.parseLong(textViewScore.getText().toString());
+		if (currentScore > record) {
 			saveScore();
 		}
 		closeGame();
