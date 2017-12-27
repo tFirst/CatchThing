@@ -3,6 +3,7 @@ package com.catchthing.catchthing.games;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,13 @@ import com.catchthing.catchthing.calculate.Point;
 import com.catchthing.catchthing.connect.HttpRequestTask;
 import com.catchthing.catchthing.status.StateMain;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -29,10 +37,12 @@ import java.util.concurrent.ExecutionException;
 public class GameLeft extends AppCompatActivity {
 
 	private static final String URL = "https://catching.herokuapp.com"; // URL сервера
+	private static final String filename = "game_left.ct";
 	private int DIFFICULTY_LEVEL; // уровень сложности (max = 20)
 	private int count = 0;
 	private Long userId;
 	private Long record;
+	private Boolean isOnline;
 
     private CountDownTimer countDownTimer;
     private Random random;
@@ -61,9 +71,14 @@ public class GameLeft extends AppCompatActivity {
     private void Init() {
     	// userId
 		userId = getIntent().getLongExtra("userId", 0);
+		isOnline = getIntent().getBooleanExtra("isOnline", false);
 
-    	// получение данных с сервера
-		getStats();
+		if (!isOnline) {
+			record = readOffline(0L);
+		} else {
+			// получение данных с сервера
+			getStats();
+		}
 
 		setContentView(R.layout.game_left); // определение самой активности
 
@@ -76,8 +91,8 @@ public class GameLeft extends AppCompatActivity {
         textViewScore.setText(String.valueOf(0)); // заполняется нулем перед началом игры
         textViewDesc = findViewById(R.id.textViewDesc); // правила игры
         textViewRecord = findViewById(R.id.textViewRecord); // поле для вывода рекорда
-        textViewRecord.setText(String.valueOf(record)); // заполнение поля с рекордом
-        buttonNoClickList = new ArrayList<>(); // список красно-белых кнопок
+        textViewRecord.setText(String.valueOf(record == null ? 0 : record)); // заполнение поля с рекордом
+		buttonNoClickList = new ArrayList<>(); // список красно-белых кнопок
         layoutParamsArrayList = new ArrayList<>(); // список координат кнопок на relativeLayout
 
 		// определение параметров экрана телефона
@@ -96,8 +111,10 @@ public class GameLeft extends AppCompatActivity {
     @Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putLong("userId", userId);
-		savedInstanceState.putLong("record", record);
+		if (isOnline) {
+			savedInstanceState.putLong("userId", userId);
+		}
+		savedInstanceState.putLong("record", record == null ? 0 : record);
 	}
 
 	@Override
@@ -310,23 +327,63 @@ public class GameLeft extends AppCompatActivity {
 
     // отправка рекорда на сервер
     private void saveScore() {
-        String url = URL +
-                "/game" +
-                "/saveGameLeft" +
-                "?userId=" +
-                userId +
-                "&record=" +
-                textViewScore.getText();
+    	if (isOnline) {
+			String url = URL +
+					"/game" +
+					"/saveGameLeft" +
+					"?userId=" +
+					userId +
+					"&record=" +
+					readOffline(Long.parseLong(String.valueOf(textViewScore.getText())));
 
-        new HttpRequestTask(url).execute();
+			new HttpRequestTask(url).execute();
+		} else {
+    		saveOffline();
+		}
     }
+
+    private void saveOffline() {
+		FileOutputStream outputStream;
+		Long currCount = Long.parseLong(String.valueOf(textViewScore.getText()));
+
+		try {
+			outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+			OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+			osw.write(currCount > record ? currCount.toString() : record.toString());
+			osw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Long readOffline(Long num) {
+		Long fromFile = 0L;
+		try {
+			FileInputStream fileInputStream = openFileInput(filename);
+			InputStreamReader isr = new InputStreamReader(fileInputStream);
+			BufferedReader br = new BufferedReader(isr);
+			String line;
+			while ((line = br.readLine()) != null) {
+				fromFile = Long.parseLong(line);
+			}
+			fileInputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return (fromFile > num) ? fromFile : num;
+	}
 
     // обработка нажатия кнопки "Назад"
 	@Override
 	public void onBackPressed() {
     	Long currentScore = Long.parseLong(textViewScore.getText().toString());
-		if (currentScore > record) {
+		if (isOnline && currentScore > record) {
 			saveScore();
+		} else if (!isOnline) {
+			saveOffline();
 		}
 		closeGame();
 	}

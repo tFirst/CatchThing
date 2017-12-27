@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.catchthing.catchthing.status.StateMain;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,9 +27,10 @@ public class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			return restTemplate.getForObject(url, StateMain.class);
 		} catch (Exception e) {
-			Log.e("HttpRequestTask", e.getMessage(), e);
+			Log.e("HttpRequestTask", "Нет подключения к серверу", e);
+			StateMain state = new StateMain();
+			state.setStatus(HttpStatus.GATEWAY_TIMEOUT);
+			return state;
 		}
-
-		return null;
 	}
 }

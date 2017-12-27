@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import com.catchthing.catchthing.connect.HttpRequestTask;
 import com.catchthing.catchthing.status.StateMain;
 
+import org.springframework.http.HttpStatus;
+
 import java.util.concurrent.ExecutionException;
 
 // загрузочный экран приложения
@@ -18,6 +20,7 @@ public class SplashActivity extends AppCompatActivity {
 
 	private String deviceId;
 	private Long userId;
+	private Boolean isOnline = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +31,7 @@ public class SplashActivity extends AppCompatActivity {
 		Intent intent = new Intent(this, MainActivity.class);
 		intent.putExtra("userId", userId);
 		intent.putExtra("deviceId", deviceId);
+		intent.putExtra("isOnline", isOnline);
 		startActivity(intent);
 		finish();
 	}
@@ -61,9 +65,13 @@ public class SplashActivity extends AppCompatActivity {
 		StateMain stateMain = getDatas(url);
 
 		if (stateMain != null) {
-			userId = stateMain.getUserId();
+			if (stateMain.getStatus() != HttpStatus.GATEWAY_TIMEOUT) {
+				userId = stateMain.getUserId();
+			} else {
+				isOnline = false;
+			}
 		} else {
-			userId = 0L;
+			isOnline = false;
 		}
 	}
 

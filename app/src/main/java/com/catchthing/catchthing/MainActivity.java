@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static Long userId;
     private String deviceId;
+    private Boolean isOnline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             userId = getIntent().getLongExtra("userId", 0);
             deviceId = getIntent().getStringExtra("deviceId");
+            isOnline = getIntent().getBooleanExtra("isOnline", false);
         }
     }
 
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         deviceId = savedInstanceState.getString("deviceId");
         userId = savedInstanceState.getLong("userId");
+        isOnline = savedInstanceState.getBoolean("isOnline");
     }
 
     @Override
@@ -37,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putString("deviceId", deviceId);
         savedInstanceState.putLong("userId", userId);
+        savedInstanceState.putBoolean("isOnline", isOnline);
     }
 
     @Override
@@ -52,12 +56,14 @@ public class MainActivity extends AppCompatActivity {
     public void goGameLeft(View view) {
         Intent intent = new Intent(this, GameLeft.class);
         intent.putExtra("userId", userId);
+        intent.putExtra("isOnline", isOnline);
         startActivity(intent);
     }
 
     public void goGameRight(View view) {
         Intent intent = new Intent(this, GameRight.class);
         intent.putExtra("userId", userId);
+        intent.putExtra("isOnline", isOnline);
         startActivity(intent);
     }
 }

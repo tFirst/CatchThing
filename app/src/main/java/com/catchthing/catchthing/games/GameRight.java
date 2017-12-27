@@ -2,6 +2,7 @@ package com.catchthing.catchthing.games;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -18,6 +19,13 @@ import com.catchthing.catchthing.R;
 import com.catchthing.catchthing.connect.HttpRequestTask;
 import com.catchthing.catchthing.status.StateMain;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
@@ -27,9 +35,11 @@ public class GameRight extends AppCompatActivity {
     private GameRight gameRight = this;
 
     private static final String URL = "https://catching.herokuapp.com"; // URL сервера
+    private static final String filename = "game_right.ct";
     private static Long userId;
     private int count = 0;
     private Long record;
+    private Boolean isOnline;
 
     private CountDownTimer countDownTimer;
     private Random random;
@@ -55,8 +65,14 @@ public class GameRight extends AppCompatActivity {
         // userId
         userId = getIntent().getLongExtra("userId", 0);
 
-        // получение данных с сервера
-        getStats();
+        isOnline = getIntent().getBooleanExtra("isOnline", false);
+
+        if (!isOnline) {
+            record = readOffline(0L);
+        } else {
+            // получение данных с сервера
+            getStats();
+        }
 
         setContentView(R.layout.game_right); // определение самой активности
 
@@ -68,7 +84,7 @@ public class GameRight extends AppCompatActivity {
         textViewScore = findViewById(R.id.textViewScoreRight); // поле для вывода текущих очков
         textViewScore.setText(String.valueOf(0)); // заполняем нулем перед игрой
         textViewRecordRight = findViewById(R.id.textViewRecordRight); // поле для вывода рекорда игры
-        textViewRecordRight.setText(String.valueOf(record)); // заполнение поля с рекордом
+        textViewRecordRight.setText(String.valueOf(record == null ? 0 : record)); // заполнение поля с рекордом
 
         // определение параметров дисплея телефона
         Display display = getWindowManager().getDefaultDisplay();
@@ -273,23 +289,64 @@ public class GameRight extends AppCompatActivity {
 
     // передача рекорда на сервер
     private void saveScore() {
-        String url = URL +
-                "/game" +
-                "/saveGameRight" +
-                "?userId=" +
-                userId +
-                "&record=" +
-                textViewScore.getText();
+        if (isOnline) {
+            String url = URL +
+                    "/game" +
+                    "/saveGameRight" +
+                    "?userId=" +
+                    userId +
+                    "&record=" +
+                    readOffline(Long.parseLong(String.valueOf(textViewScore.getText())));
 
-        new HttpRequestTask(url).execute();
+            new HttpRequestTask(url).execute();
+        } else {
+            saveOffline();
+        }
+    }
+
+    private void saveOffline() {
+        FileOutputStream outputStream;
+        Long currCount = Long.parseLong(String.valueOf(textViewScore.getText()));
+
+        try {
+            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+            OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+            osw.write(currCount > record ? currCount.toString() : record.toString());
+            osw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Long readOffline(Long num) {
+        Long fromFile = 0L;
+        try {
+            FileInputStream fileInputStream = openFileInput(filename);
+            InputStreamReader isr = new InputStreamReader(fileInputStream);
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+                fromFile = Long.parseLong(line);
+            }
+            fileInputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (fromFile > num) ? fromFile : num;
     }
 
     // обработка нажатия на кнопку "Назад" телефона
     @Override
     public void onBackPressed() {
         Long currentScore = Long.parseLong(textViewScore.getText().toString());
-        if (currentScore > record) {
+        if (isOnline && currentScore > record) {
             saveScore();
+        } else if (!isOnline) {
+            saveOffline();
         }
         closeGame();
     }
