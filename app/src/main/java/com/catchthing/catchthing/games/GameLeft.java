@@ -59,6 +59,9 @@ public class GameLeft extends AppCompatActivity {
 
     // инициализация компонентов активности
     private void Init() {
+    	// userId
+		userId = getIntent().getLongExtra("userId", 0);
+
     	// получение данных с сервера
 		getStats();
 
@@ -76,8 +79,6 @@ public class GameLeft extends AppCompatActivity {
         textViewRecord.setText(String.valueOf(record)); // заполнение поля с рекордом
         buttonNoClickList = new ArrayList<>(); // список красно-белых кнопок
         layoutParamsArrayList = new ArrayList<>(); // список координат кнопок на relativeLayout
-
-        userId = getIntent().getLongExtra("userId", 0); // userId
 
 		// определение параметров экрана телефона
         Display display = getWindowManager().getDefaultDisplay();
@@ -302,6 +303,7 @@ public class GameLeft extends AppCompatActivity {
     // закрываем активность
     private void closeGame() {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("userId", userId);
         startActivity(intent);
         finish();
     }
@@ -322,7 +324,8 @@ public class GameLeft extends AppCompatActivity {
     // обработка нажатия кнопки "Назад"
 	@Override
 	public void onBackPressed() {
-		if (Long.parseLong(textViewScore.getText().toString()) > Long.parseLong(textViewRecord.getText().toString())) {
+    	Long currentScore = Long.parseLong(textViewScore.getText().toString());
+		if (currentScore > record) {
 			saveScore();
 		}
 		closeGame();

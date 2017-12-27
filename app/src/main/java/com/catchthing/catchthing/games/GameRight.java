@@ -52,6 +52,9 @@ public class GameRight extends AppCompatActivity {
 
     // инициализация компонентов активности
     private void Init() {
+        // userId
+        userId = getIntent().getLongExtra("userId", 0);
+
         // получение данных с сервера
         getStats();
 
@@ -66,8 +69,6 @@ public class GameRight extends AppCompatActivity {
         textViewScore.setText(String.valueOf(0)); // заполняем нулем перед игрой
         textViewRecordRight = findViewById(R.id.textViewRecordRight); // поле для вывода рекорда игры
         textViewRecordRight.setText(String.valueOf(record)); // заполнение поля с рекордом
-
-        userId = getIntent().getLongExtra("userId", 0); // userId
 
         // определение параметров дисплея телефона
         Display display = getWindowManager().getDefaultDisplay();
@@ -174,7 +175,7 @@ public class GameRight extends AppCompatActivity {
 
     // обработчик нажатия на зелено-белую кнопку
     public void clickToButtonRight(View view) throws InterruptedException {
-        buttonGame.setVisibility(View.INVISIBLE);
+        buttonGame.setVisibility(View.GONE);
         count++;
         if (countDownTimer != null) {
             countDownTimer.cancel();
@@ -265,6 +266,7 @@ public class GameRight extends AppCompatActivity {
     // выход в главное меню
     private void closeGame() {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("userId", userId);
         startActivity(intent);
         finish();
     }
@@ -285,8 +287,8 @@ public class GameRight extends AppCompatActivity {
     // обработка нажатия на кнопку "Назад" телефона
     @Override
     public void onBackPressed() {
-        if (Long.parseLong(textViewScore.getText().toString()) >
-                Long.parseLong(textViewRecordRight.getText().toString())) {
+        Long currentScore = Long.parseLong(textViewScore.getText().toString());
+        if (currentScore > record) {
             saveScore();
         }
         closeGame();
