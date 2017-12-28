@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("userId", userId);
         intent.putExtra("isOnline", isOnline);
         startActivity(intent);
+        finish();
     }
 
     public void goGameRight(View view) {
@@ -65,5 +66,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("userId", userId);
         intent.putExtra("isOnline", isOnline);
         startActivity(intent);
+        finish();
     }
 }
