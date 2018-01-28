@@ -34,8 +34,8 @@ public class GameRight extends AppCompatActivity {
 
     private GameRight gameRight = this;
 
-    private final String URL = getString(R.string.url);
-    private final String filename = getString(R.string.fileNameRight);
+    private String URL = null;
+    private String filename = null;
     private static Long userId;
     private int count = 0;
     private Long record;
@@ -62,6 +62,8 @@ public class GameRight extends AppCompatActivity {
 
     // инициализация компонентов активности
     private void Init() {
+        URL = getString(R.string.url);
+        filename = getString(R.string.fileNameRight);
         // userId
         userId = getIntent().getLongExtra("userId", 0);
 

@@ -33,8 +33,8 @@ import java.util.Random;
 // игра слева
 public class GameLeft extends AppCompatActivity {
 
-    private final String URL = getString(R.string.url);
-    private final String filename = getString(R.string.fileNameLeft);
+    private String URL = null;
+    private String filename = null;
     private int DIFFICULTY_LEVEL; // уровень сложности (max = 20)
     private int count = 0;
 	private Long userId;
@@ -66,6 +66,8 @@ public class GameLeft extends AppCompatActivity {
 
     // инициализация компонентов активности
     private void Init() {
+    	URL = getString(R.string.url);
+    	filename = getString(R.string.fileNameLeft);
     	// userId
 		userId = getIntent().getLongExtra("userId", 0);
 		isOnline = getIntent().getBooleanExtra("isOnline", false);
