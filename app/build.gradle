@@ -34,5 +34,5 @@ dependencies {
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
     provided group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
-    annotationProcessor 'org.projectlombok:lombok:1.16.21'
+    annotationProcessor 'org.projectlombok:lombok:1.16.20'
 }

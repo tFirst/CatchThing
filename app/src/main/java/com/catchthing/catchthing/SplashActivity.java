@@ -16,8 +16,6 @@ import java.util.concurrent.ExecutionException;
 // загрузочный экран приложения
 public class SplashActivity extends AppCompatActivity {
 
-    private final String URL = getString(R.string.url);
-
     private String deviceId;
     private Long userId;
     private Boolean isOnline = true;
@@ -56,7 +54,7 @@ public class SplashActivity extends AppCompatActivity {
                 Settings.Secure.ANDROID_ID);
 
         StringBuilder url = new StringBuilder()
-                .append(URL)
+                .append(getString(R.string.url))
                 .append("/auth")
                 .append("/user")
                 .append("?deviceId=")
