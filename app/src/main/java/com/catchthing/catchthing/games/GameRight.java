@@ -34,8 +34,8 @@ public class GameRight extends AppCompatActivity {
 
     private GameRight gameRight = this;
 
-    private static final String URL = "https://catching.herokuapp.com"; // URL сервера
-    private static final String filename = "game_right.ct";
+    private final String URL = getString(R.string.url);
+    private final String filename = getString(R.string.fileNameRight);
     private static Long userId;
     private int count = 0;
     private Long record;
