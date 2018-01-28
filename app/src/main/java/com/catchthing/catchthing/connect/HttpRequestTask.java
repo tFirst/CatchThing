@@ -9,15 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-// REST-соединение с сервером
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
 
 	// запрос на сервер
 	private String url;
-
-	public HttpRequestTask(String url) {
-		this.url = url;
-	}
 
 	// передача запроса на сервер
 	@Override
@@ -28,9 +26,9 @@ public class HttpRequestTask extends AsyncTask<Void, Void, StateMain> {
 			return restTemplate.getForObject(url, StateMain.class);
 		} catch (Exception e) {
 			Log.e("HttpRequestTask", "Нет подключения к серверу", e);
-			StateMain state = new StateMain();
-			state.setStatus(HttpStatus.GATEWAY_TIMEOUT);
-			return state;
-		}
+            return StateMain.builder()
+                    .status(HttpStatus.GATEWAY_TIMEOUT)
+                    .build();
+        }
 	}
 }

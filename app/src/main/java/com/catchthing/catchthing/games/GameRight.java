@@ -32,6 +32,8 @@ import java.util.concurrent.ExecutionException;
 // игра справа
 public class GameRight extends AppCompatActivity {
 
+    private final GameService gameService;
+
     private GameRight gameRight = this;
 
     private String URL = null;
@@ -50,6 +52,10 @@ public class GameRight extends AppCompatActivity {
     private Button buttonGame;
     private Button startGameButton;
     private Boolean isAlertDialog = false;
+
+    public GameRight(GameService gameService) {
+        this.gameService = gameService;
+    }
 
 
     @Override
@@ -151,44 +157,7 @@ public class GameRight extends AppCompatActivity {
 
     // определяем координаты для кнопки
     private RelativeLayout.LayoutParams getRandomParams() {
-        int sizeCircles = 75;
-        RelativeLayout.LayoutParams layoutParams =
-                new RelativeLayout.LayoutParams(sizeCircles, sizeCircles);
-        int left, top;
-
-        System.out.println("Relative height " + relativeLayout.getHeight() +
-                " width " + relativeLayout.getWidth());
-
-        left = random.nextInt(relativeLayout.getWidth());
-        if (left > sizeCircles)
-            if (left < relativeLayout.getWidth() - sizeCircles) {
-                System.out.println("norm game_left");
-                layoutParams.leftMargin = left;
-            } else {
-                System.out.println("game_left " + left + " > l gr");
-                layoutParams.leftMargin = left - (sizeCircles - (relativeLayout.getWidth() - left - 1));
-            }
-        else {
-            System.out.println("l " + left + " < size");
-            layoutParams.leftMargin += (sizeCircles + 1);
-        }
-
-        top = random.nextInt(relativeLayout.getHeight());
-        if (top > sizeCircles)
-            if (top < relativeLayout.getHeight() - sizeCircles) {
-                System.out.println("norm top");
-                layoutParams.topMargin = top;
-            } else {
-                System.out.println("t " + top + " > t gr");
-                layoutParams.topMargin = top - (sizeCircles - (relativeLayout.getHeight() - top - 1));
-            }
-        else {
-            System.out.println("t " + top + " < size");
-            layoutParams.topMargin += (sizeCircles + 1);
-        }
-        System.out.println("rand l " + left + " rand t " + top);
-        System.out.println("lp l " + layoutParams.leftMargin + " lp t " + layoutParams.topMargin);
-        return layoutParams;
+        return gameService.calculateRandomParams(relativeLayout, random);
     }
 
     // обработчик нажатия на зелено-белую кнопку
