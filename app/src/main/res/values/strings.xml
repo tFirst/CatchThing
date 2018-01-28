@@ -10,4 +10,7 @@
     <string name="descriptionGameRight">Никто не знает, когда появится очередной леденец. Собери как можно больше!</string>
     <string name="descGo">Begin?</string>
     <string name="descCollect">Can you collect them all?</string>
+    <string name="url">https://catching.herokuapp.com</string>
+    <string name="fileNameLeft">game_left.ct</string>
+    <string name="fileNameRight">game_right.ct</string>
 </resources>
